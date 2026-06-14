@@ -1,9 +1,9 @@
-import React from 'react'
-
+'use client'
+import LoginForm from '@/components/LoginForm'
 function page() {
   return (
     <div>
-      Sign-in page
+      <LoginForm/>
     </div>
   )
 }

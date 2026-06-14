@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           ]})
   
           if(!existingUser){
-            throw new Error('No User found with this email')
+            throw new Error('Invalid combination')
           }
           if(!existingUser?.isVerified){
             throw new Error("Please verify your account before login")
