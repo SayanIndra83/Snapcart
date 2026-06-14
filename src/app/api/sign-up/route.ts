@@ -8,8 +8,9 @@ export async function POST(request: NextRequest){
     await dbConnect();
     try {
         const body = await request.json();
+        console.log(body)
         const result = SignUpSchema.safeParse(body)
-
+        console.log(result)
 
         if(!result.success){
             return Response.json({message: "Invalid data", success: false, error: result.error.format()}, {status: 400})
@@ -23,11 +24,13 @@ export async function POST(request: NextRequest){
         const otp = Math.floor(100000+Math.random()*900000).toString()
         const userWithMobile = await UserModel.findOne({mobile})
         if(userWithMobile?.isVerified) {
+            console.log("User with this mobile number already exist")
             return NextResponse.json({message: "User with this mobile number already exist", success: false}, {status: 400})
         }
         const userWithEmail = await UserModel.findOne({email})
         if(userWithEmail) {
             if(userWithEmail.isVerified) {
+                console.log("User with this email already exist")
                 return NextResponse.json({message: "User with this email already exist", success: false}, {status: 400})
             } else {
                 const hashedPassword = await bcrypt.hash(password, 10);
@@ -60,7 +63,6 @@ export async function POST(request: NextRequest){
             return NextResponse.json({
                 success: true,
                 message: "Successfully account created",
-                
             },
         {
             status: 200

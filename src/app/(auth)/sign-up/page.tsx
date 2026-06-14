@@ -1,9 +1,10 @@
-import React from 'react'
+'use client'
+import SignUpForm from '@/components/SignUpForm'
 
 function page() {
   return (
     <div>
-      Sign-up page
+      <SignUpForm/>
     </div>
   )
 }

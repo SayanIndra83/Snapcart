@@ -6,20 +6,21 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest){
     await dbConnect()
     try {
-        const {username, otp} = await req.json()
+        const {email, otp} = await req.json()
+        console.log(email, otp)
         const result = VerifySchema.safeParse({otp})
         if(!result.success){
-            throw NextResponse.json({
+            return NextResponse.json({
                 success: false,
                 message: "Invalid otp",
                 error : result.error.format()
             }, {status: 400})
         }
     
-        const user = await UserModel.findOne({username});
+        const user = await UserModel.findOne({email});
         if(!user){
             console.log("User does not exist")
-            throw NextResponse.json({
+            return NextResponse.json({
                 success: false,
                 message: "User not found",
             }, {status: 404})
