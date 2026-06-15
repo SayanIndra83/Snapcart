@@ -38,7 +38,7 @@ function LoginForm() {
             })
 
             if(response.error){
-                toast.error("Invalid combination")
+                toast.error(response.error ?? "Invalid combination")
                 return
             }
 
@@ -48,7 +48,7 @@ function LoginForm() {
                 router.refresh()
             }
         } catch (error) {
-            toast.error("An unexpected error occurred")
+            toast.error("Something went wrong")
         }finally{setIsSubmitting(false)}
     }
 
@@ -201,6 +201,8 @@ function LoginForm() {
         <button
         type='button'
                 className='w-full flex gap-3 items-center justify-center bg-gray-100 hover:bg-gray-200 py-2.5 rounded-2xl cursor-pointer text-gry-700 text-sm font-medium transition-all duration-200'
+                onClick={() => signIn("google", {callbackUrl: '/'})
+                }
                 >
                 <Image src={googleImage} alt='google logo' width={20} height={20} 
                 /> Continue with Google

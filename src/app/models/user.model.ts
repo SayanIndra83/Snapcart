@@ -3,12 +3,13 @@ import mongoose, {Model, Schema, model, models} from "mongoose";
 export interface IUser extends Document{
     username: string,
     email: string,
-    password: string,
-    mobile: string,
+    password?: string,
+    mobile?: string,
     role: "user" | "admin" | "deliveryboy",
     otp:string,
     verifycodeExpiry:Date,
     isVerified: boolean,
+    userImage?: string,
 }
 
 const userSchema = new Schema<IUser>({
@@ -24,13 +25,13 @@ email:{
 },
 mobile:{
     type: String,
-    required: [true, "Mobile number is required"],
+    required: false,
     unique: true,
     match:[/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Please provide a valid mobile number."],
 },
 password:{
         type: String,
-        required: [true, "Password is required."],
+        required: false,
     },
     otp:{
         type: String,
@@ -49,6 +50,10 @@ password:{
         type: String,
         enum:["user", "deliveryboy", "admin"],
         default: "user"
+    },
+    userImage:{
+        required: false,
+        type: String
     }
 }, {timestamps: true})
 

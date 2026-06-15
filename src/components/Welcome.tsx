@@ -78,7 +78,7 @@ function Welcome() {
       className="mt-10 inline-flex items-center gap-2 border-0 rounded-2xl bg-green-600 font-semibold py-3 px-8 text-white cursor-pointer hover:bg-green-700 group transition-all duration-200 shadow-xl shadow-gray-400"
       onClick={() => router.push('/sign-up')}
       >
-        Next 
+        Start Shopping 
         <ArrowRight className="group-hover:translate-x-0.5 transition-all duration-200"/>
       </motion.button>
 

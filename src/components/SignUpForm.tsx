@@ -9,6 +9,7 @@ import googleImage from "@/assets/google_logo.webp"
 import { SignUpSchema } from '@/app/schemas/signup.schema'
 import toast from 'react-hot-toast'
 import { ApiResponse } from '@/app/types/ApiResponse'
+import { signIn } from 'next-auth/react'
 
 function SignUpForm() {
     const router = useRouter()
@@ -231,7 +232,8 @@ function SignUpForm() {
         
         <button
         type='button'
-                className='w-full flex gap-3 items-center justify-center bg-gray-100 hover:bg-gray-200 py-2.5 rounded-2xl cursor-pointer text-gry-700 text-sm font-medium transition-all duration-200'
+                className='w-full flex gap-3 items-center justify-center bg-gray-100 hover:bg-gray-200 py-2.5 rounded-2xl  cursor-pointer text-gry-700 text-sm font-medium transition-all duration-200'
+                onClick={() => {signIn("google", {callbackUrl:'/'})}}
                 >
                 <Image src={googleImage} alt='google logo' width={20} height={20} 
                 /> Continue with Google

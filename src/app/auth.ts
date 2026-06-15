@@ -1,9 +1,16 @@
-import NextAuth from "next-auth"
+import NextAuth, { CredentialsSignin } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import dbConnect from "./lib/dbConnect"
 import UserModel from "./models/user.model";
 import bcrypt from "bcryptjs";
- 
+import Google from "next-auth/providers/google";
+
+class AuthError extends CredentialsSignin{
+  constructor(msg: string){
+    super()
+    this.code = msg
+  }
+}
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -12,6 +19,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) : Promise<any>{
+        if(!credentials.identifier) {
+          throw new AuthError("Email or Mobile number is required")
+        }
+        if(!credentials.password) {
+          throw new AuthError("Password is required")
+        }
         await dbConnect();
         try {
           const existingUser = await UserModel.findOne({$or:[
@@ -20,23 +33,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           ]})
   
           if(!existingUser){
-            throw new Error('Invalid combination')
+            throw new AuthError('Invalid combination')
           }
           if(!existingUser?.isVerified){
-            throw new Error("Please verify your account before login")
+            throw new AuthError("Please verify your account before login")
+          }
+          if(!existingUser.password){
+            throw new AuthError("You signed up with Google. Please click 'Continue with Google' below.")
           }
 
           const isPasswordCorrect = await bcrypt.compare(credentials.password, existingUser.password)
 
           if(!isPasswordCorrect){
-            throw new Error("Incorrect password")
+            throw new AuthError("Incorrect password")
           }
 
           return existingUser
         } catch (error: any) {
-          throw new Error("Error in checking inputs", error)
+          if(error instanceof AuthError){
+            throw error
+          }
+          throw new AuthError("An unexpected server error occurred")
         }
       }
+    }),
+    Google({
+      clientId:process.env.CLIENT_ID,
+      clientSecret:process.env.CLIENT_SECRET
     })
   ],
   secret: process.env.BETTER_AUTH_SECRET,
@@ -45,9 +68,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session:{
     strategy: "jwt",
-    maxAge: 7*24*60*60*1000 //7 days
+    maxAge: 7*24*60*60 //7 days
   },
   callbacks:{
+
+    // now google provider upon successfull login will return some data that we have to add to database
+    async signIn({user, account}){
+      if(account?.provider === "google"){
+        await dbConnect()
+        // console.log(user?.email)
+        let existingUser = await UserModel.findOne({email: user?.email})
+
+        // if existingUser is null -> we will create one and send to verify route
+        // if exist then check isVerified, if yes then login , if not send verification email
+        if(!existingUser){
+          existingUser = await UserModel.create({
+            username : user.name ?? user.email?.split('@')[0],
+            userImage: user.image ?? "",
+            email: user.email ?? "",
+            isVerified: true,
+            verifycodeExpiry: new Date(),
+            otp:"000000", //if google so already verified
+            password: ""
+          })
+
+          await existingUser.save()
+        }
+        user.id = existingUser._id.toString()
+        user.role = existingUser.role
+        user.isVerified = existingUser.isVerified
+        user.username = existingUser.username
+      }
+
+      return true
+    },
 
     // putting user into token
 
