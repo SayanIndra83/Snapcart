@@ -11,8 +11,6 @@ import { signIn, useSession } from 'next-auth/react'
 
 
 function LoginForm() {
-    const session = useSession()
-    // console.log(session)
     const router = useRouter()
     const [password, setPassword] = useState("")
     const [identifier, setIdentifier] = useState("")

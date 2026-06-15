@@ -96,6 +96,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user.role = existingUser.role
         user.isVerified = existingUser.isVerified
         user.username = existingUser.username
+        user.mobile = existingUser.mobile
       }
 
       return true
@@ -104,15 +105,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // putting user into token
 
     //token is that token which on signin we got and the user is that user what we have returned from signin ("existingUser")
-    jwt({token, user}) {
+    jwt({token, user, trigger, session}) {
       if(user){
         token.id = user.id?.toString()
         token.isVerified = user.isVerified,
         token.role = user.role
         token.username = user.username
         token.email = user.email
+        token.mobile = user.mobile
       }
 
+      if((trigger === "update") && session){
+        if(session.role) token.role = session.role
+        if(session.mobile) token.mobile = session.mobile
+      }
       return token
     },
 
@@ -123,6 +129,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = token.role  as string
         session.user.username = token.username  as string
         session.user.email = token.email as string
+        session.user.mobile = token.mobile as string
       }
       return session
     }

@@ -26,6 +26,7 @@ email:{
 mobile:{
     type: String,
     required: false,
+    default:"",
     unique: true,
     match:[/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Please provide a valid mobile number."],
 },
