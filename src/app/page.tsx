@@ -16,10 +16,11 @@ export default function Home() {
   // console.log(session.data?.user.email
 
   if (status === "loading") return <div>Loading...</div>;
+
   return (
     <div className="relative">
       {session?.user ? (
-        !role || !mobile || (mobile !== "" && role === "user") ? (
+        !role || !mobile || (mobile !== "" && role === "deliveryboy") ? (
           <EditRole />
         ) : (
           <>

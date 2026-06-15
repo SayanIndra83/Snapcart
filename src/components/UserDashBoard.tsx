@@ -1,10 +1,11 @@
 import React from 'react'
+import HeroSection from './HeroSection'
 
 function UserDashBoard() {
   return (
-    <div>
-      
-    </div>
+    <>
+      <HeroSection/>
+    </>
   )
 }
 
