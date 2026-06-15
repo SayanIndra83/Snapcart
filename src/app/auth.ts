@@ -91,8 +91,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             otp:"000000", //if google so already verified
             password: ""
           })
-
-          await existingUser.save()
         }
         user.id = existingUser._id.toString()
         user.role = existingUser.role

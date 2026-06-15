@@ -5,8 +5,10 @@ export const SignUpSchema = z.object({
     email: z.string().email({message: "Please enter a valid email address"}),
     password: z
     .string()
-    .min(6, {message: "Password must be atleast 6 charracters long"})
-    .max(10, {message:"Password must be no more than 10 charracters"})
+    .min(8, {message: "Password must be atleast 8 charracters long"})
+    .max(16, {message:"Password must be no more than 16 charracters"})
+    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" })
     .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character" }),
     mobile:z.string().regex(/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, {message: "Please enter a valid phone number"})

@@ -20,18 +20,34 @@ function SignUpForm() {
     const [isPassShow, setIsPassShow] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [passError, setPassError] = useState("")
+    const [emailError, setEmailError] = useState("")
+    const [mobileError, setMobileError] = useState("")
 
-    const validataPass = ()=> {
+    const validatePass = ()=> {
         const result = SignUpSchema.safeParse({username, email, password, mobile})
         if(!result.success && result.error.flatten().fieldErrors.password){
             setPassError(result.error?.flatten().fieldErrors.password?.[0] ?? "")
         }
         else setPassError("")
     }
+    const validateEmail = ()=> {
+        const result = SignUpSchema.safeParse({username, email, password, mobile})
+        if(!result.success && result.error.flatten().fieldErrors.email){
+            setEmailError(result.error?.flatten().fieldErrors.email?.[0] ?? "")
+        }
+        else setEmailError("")
+    }
+    const validateMobile = ()=> {
+        const result = SignUpSchema.safeParse({username, email, password, mobile})
+        if(!result.success && result.error.flatten().fieldErrors.mobile){
+            setMobileError(result.error?.flatten().fieldErrors.mobile?.[0] ?? "")
+        }
+        else setMobileError("")
+    }
 
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if(passError !== "") return 
+        if(passError !== "" || emailError !== "" || mobileError !== "") return 
         setIsSubmitting(true)
         try {
             const response = await axios.post(`/api/sign-up`, {
@@ -138,10 +154,16 @@ function SignUpForm() {
             value={email}
             autoCorrect="off"
             autoCapitalize="off"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {setEmail(e.target.value)
+              setEmailError("")
+            }}
+            onBlur={validateEmail}
             className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
         </div>
-
+        {emailError &&
+            (
+                <p className="text-red-500 text-xs -mt-3 ml-2">{emailError}</p>
+            )}
         {/* mobile */}
         <div
         className='relative'
@@ -158,10 +180,16 @@ function SignUpForm() {
             autoCorrect="off"
             autoCapitalize="off"
             placeholder='Enter your mobile number' 
-            onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+            onChange={(e) => {setMobile(e.target.value.replace(/\D/g, ''))
+              setMobileError("")
+            }}
+            onBlur={validateMobile}
             className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
         </div>
-
+        {mobileError &&
+            (
+                <p className="text-red-500 text-xs -mt-3 ml-2">{mobileError}</p>
+            )}
         {/* password */}
         <div
         className='relative'
@@ -179,7 +207,7 @@ function SignUpForm() {
             onChange={(e) => {setPassword(e.target.value)
                 if(passError) setPassError("")
             }}
-            onBlur={validataPass}
+            onBlur={validatePass}
             className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
             <button className='absolute right-3 top-3.5 text-gray-500 z-99 cursor-pointer'
             onClick={() => setIsPassShow(!isPassShow)}
