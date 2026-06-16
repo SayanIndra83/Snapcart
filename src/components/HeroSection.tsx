@@ -109,8 +109,8 @@ function HeroSection() {
             key={idx}
             onClick={() => setCurrState(idx)}
             aria-label={`Go to slide ${idx + 1}`}
-            className={`h-3 rounded-full transition-all duration-300 cursor-pointer ${
-              idx === currState ? "bg-white w-8" : "bg-white/50 w-3 hover:bg-white/80"
+            className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
+              idx === currState ? "bg-white w-6" : "bg-white/50 w-2 hover:bg-white/80"
             }`}
           />
         ))}
