@@ -19,8 +19,7 @@ export default function Home() {
 
   return (
     <div className="relative">
-      {session?.user ? (
-        !role || !mobile || (mobile !== "" && role === "deliveryboy") ? (
+      {session?.user ? (!role || !mobile || (!mobile && role === "user") ? (
           <EditRole />
         ) : (
           <>

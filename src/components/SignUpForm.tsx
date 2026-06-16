@@ -16,42 +16,33 @@ function SignUpForm() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
-    const [mobile, setMobile] = useState("")
     const [isPassShow, setIsPassShow] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [passError, setPassError] = useState("")
     const [emailError, setEmailError] = useState("")
-    const [mobileError, setMobileError] = useState("")
 
     const validatePass = ()=> {
-        const result = SignUpSchema.safeParse({username, email, password, mobile})
+        const result = SignUpSchema.safeParse({username, email, password})
         if(!result.success && result.error.flatten().fieldErrors.password){
             setPassError(result.error?.flatten().fieldErrors.password?.[0] ?? "")
         }
         else setPassError("")
     }
     const validateEmail = ()=> {
-        const result = SignUpSchema.safeParse({username, email, password, mobile})
+        const result = SignUpSchema.safeParse({username, email, password})
         if(!result.success && result.error.flatten().fieldErrors.email){
             setEmailError(result.error?.flatten().fieldErrors.email?.[0] ?? "")
         }
         else setEmailError("")
     }
-    const validateMobile = ()=> {
-        const result = SignUpSchema.safeParse({username, email, password, mobile})
-        if(!result.success && result.error.flatten().fieldErrors.mobile){
-            setMobileError(result.error?.flatten().fieldErrors.mobile?.[0] ?? "")
-        }
-        else setMobileError("")
-    }
 
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if(passError !== "" || emailError !== "" || mobileError !== "") return 
+        if(passError !== "" || emailError !== "") return 
         setIsSubmitting(true)
         try {
             const response = await axios.post(`/api/sign-up`, {
-                username, password, mobile, email
+                username, password, email
             })
             toast.success(response?.data.message ?? "Account created")
             router.push(`/verify/${email}`)
@@ -59,7 +50,7 @@ function SignUpForm() {
             const axiosError = error as AxiosError<ApiResponse>
             toast.error(axiosError.response?.data.message?? "Signup failed")
         }finally{
-            setUsername(""), setEmail(""), setPassword(""), setMobile("")
+            setUsername(""), setEmail(""), setPassword("")
             setIsSubmitting(false)
         }
     }
@@ -137,7 +128,7 @@ function SignUpForm() {
             autoCorrect="off"
             autoCapitalize="off"
             onChange={(e) => setUsername(e.target.value)}
-            className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
+            className='focus:outline-none w-full border border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
         </div>
 
         {/* Email */}
@@ -158,37 +149,11 @@ function SignUpForm() {
               setEmailError("")
             }}
             onBlur={validateEmail}
-            className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
+            className='focus:outline-none w-full border border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
         </div>
         {emailError &&
             (
                 <p className="text-red-500 text-xs -mt-3 ml-2">{emailError}</p>
-            )}
-        {/* mobile */}
-        <div
-        className='relative'
-        >
-            <Phone size={20} className='absolute left-3 top-3.5 text-gray-500 z-99'/>
-            <input 
-            name='mobile'
-            type='text' 
-            inputMode='numeric'
-            maxLength={10}
-            value={mobile}
-            required={true}
-            spellCheck={false}
-            autoCorrect="off"
-            autoCapitalize="off"
-            placeholder='Enter your mobile number' 
-            onChange={(e) => {setMobile(e.target.value.replace(/\D/g, ''))
-              setMobileError("")
-            }}
-            onBlur={validateMobile}
-            className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
-        </div>
-        {mobileError &&
-            (
-                <p className="text-red-500 text-xs -mt-3 ml-2">{mobileError}</p>
             )}
         {/* password */}
         <div
@@ -208,7 +173,7 @@ function SignUpForm() {
                 if(passError) setPassError("")
             }}
             onBlur={validatePass}
-            className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
+            className='focus:outline-none w-full border border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
             <button className='absolute right-3 top-3.5 text-gray-500 z-99 cursor-pointer'
             onClick={() => setIsPassShow(!isPassShow)}
             
@@ -231,7 +196,7 @@ function SignUpForm() {
         {/* Button section */}
         {
             (() => {
-                const formValid = username !== "" && email!=="" && password!== "" && mobile!== "" && passError === ""
+                const formValid = username !== "" && email!=="" && password!== "" && passError === ""
                 return <button
                 disabled={isSubmitting || !formValid}
                 type='submit'

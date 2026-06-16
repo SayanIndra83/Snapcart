@@ -166,6 +166,20 @@ function LoginForm() {
             )}
         </div>
 
+        <div className='inline-flex items-center justify-center text-gray-600 text-sm mt-1 gap-2 font-medium'>
+        <span>
+            Forgot password ?
+        </span>
+        <Link
+        href={'/reset-password'}
+        className='text-green-600 hover:text-green-700 transition-all duration-200'
+        >Reset  password</Link>
+      </div>
+
+        <div className='w-full flex gap-2 text-gray-400 text-sm mt-1 items-center'>
+            <span className='flex-1 h-px bg-gray-200'></span>
+        </div>
+
         {/* Button section */}
         {
             (() => {

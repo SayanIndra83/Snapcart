@@ -1,11 +1,11 @@
 'use client'
-import { Cross, Loader, Loader2, LogOut, Package, Search, ShoppingCart, User, X } from 'lucide-react'
+import {Loader, LogOut, Search, ShoppingBag, ShoppingCart, User, X } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import { signOut, useSession } from 'next-auth/react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 function Navbar() {
@@ -23,6 +23,7 @@ function Navbar() {
             toast.error("Logout failed")
         }finally{
             setLoggingOut(false)
+            setOpen(false)
         }
     }
 
@@ -134,7 +135,7 @@ function Navbar() {
                 >
 
                     {/* user div */}
-                    <div className='flex items-center gap-3 w-full px-5 py-2 border-1 rounded-2xl border-gray-100 overflow-hidden'>
+                    <div className='flex items-center gap-3 w-full px-2 py-2 border rounded-2xl border-gray-100 overflow-hidden'>
                         <div
                         className='flex items-center justify-center rounded-full w-10 h-10 bg-green-100 relative'
                         >
@@ -150,7 +151,7 @@ function Navbar() {
             }
                         </div>
                         <div>
-                            <div className='text-gray-800 font-semibold'>{user?.name}</div>
+                            <div className='text-gray-800 font-semibold'>{user?.username}</div>
                             <div className='text-xs text-gray-500 capitalize'>{user?.role}</div>
                         </div>
                     </div>
@@ -159,15 +160,15 @@ function Navbar() {
                     <Link
                     href={'/'}
                     onClick={() => setOpen(false)}
-                    className='flex text-left items-center gap-3 w-full pl-3 pr-5 py-2 border-1 rounded-2xl bg-green-50 hover:bg-green-100 hover:text-green-700 border-gray-100 overflow-hidden text-gray-700 font-medium text-sm group transition-all duration-200'>
-                        <Package className='text-green-600 h-5 w-5 group-hover:translate-x-1 transition-all duration-200'/>
+                    className='flex text-left items-center gap-3 w-full pl-3 pr-5 py-2 border rounded-2xl bg-green-50 hover:bg-green-100 hover:text-green-700 border-gray-100 overflow-hidden text-gray-700 font-medium text-sm group transition-all duration-200'>
+                        <ShoppingBag className='text-green-600 h-5 w-5 group-hover:translate-x-1 transition-all duration-200'/>
                         <span>My Orders</span>
                     </Link>
                     {/* Logout div */}
                     <button
                     disabled={loggingOut}
                     onClick={handleLogout}
-                    className='flex items-center text-left gap-3 w-full pl-3 pr-5 py-2 bg-red-50 border-1 rounded-2xl hover:bg-red-100 border-gray-100 overflow-hidden text-gray-700 font-medium text-sm group hover:text-red-600 cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed'>
+                    className='flex items-center text-left gap-3 w-full pl-3 pr-5 py-2 bg-red-50 border rounded-2xl hover:bg-red-100 border-gray-100 overflow-hidden text-gray-700 font-medium text-sm group hover:text-red-600 cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed'>
                     {
                         loggingOut? 
                         (<>
@@ -212,7 +213,7 @@ function Navbar() {
                     transition:{duration:0.3}
                 }}
 
-                className='fixed top-20 left-1/2 -translate-x-1/2 w-[90%] bg-gray-100 rounded-full shadow-lg z-40 flex items-center px-4 py-2 border-1 border-gray-200 '
+                className='fixed top-20 left-1/2 -translate-x-1/2 w-[90%] bg-gray-100 rounded-full shadow-lg z-40 flex items-center px-4 py-2 border border-gray-200 '
                 >
 
                     <Search className='text-gray-500 w-5 h-5  mr-2'/>

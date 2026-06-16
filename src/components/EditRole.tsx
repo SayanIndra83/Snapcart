@@ -155,7 +155,7 @@ function EditRole() {
               setMobileError("")
             }}
             onBlur={validateMobile}
-            className='focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
+            className='focus:outline-none w-full border border-gray-300 rounded-2xl bg-transparent pl-10 pr-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-green-500'/>
              {mobileError &&
             (
                 <p className="text-red-500 text-xs mt-3 ml-2">{mobileError}</p>
@@ -182,8 +182,7 @@ function EditRole() {
         handleSave()
       }}
       disabled={isSubmitting || mobileNo?.length !== 10 || !selectedRole}
-                className='mt-10 inline-flex bg-green-600 hover:bg-green-700  disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed shadow-md
-                py-3 px-7 rounded-2xl cursor-pointer text-white font-semibold text-md transition-all duration-200 flex items-center justify-center gap-4 group'
+                className='mt-10 bg-green-600 hover:bg-green-700  disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed shadow-md py-3 px-7 rounded-2xl cursor-pointer text-white font-semibold text-md transition-all duration-200 flex items-center justify-center gap-4 group'
                 >
             {
                 isSubmitting? (
@@ -193,7 +192,7 @@ function EditRole() {
                     </>
                 ):(
                     <>
-                    Save Changes <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-all duration-200"/>
+                    Save Changes <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-all duration-200 group-disabled:cursor-not-allowed"/>
                     </>
                 )
             }
