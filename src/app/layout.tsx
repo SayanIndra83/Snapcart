@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {Toaster} from "react-hot-toast"
 import AuthProvider from "@/context/AuthProvider";
+import StoreProvider from "@/context/StoreProvider";
+import InitUser from "@/InitUser";
 
 export const metadata: Metadata = {
   title: "Snapcart | 10 minutes grocery Delivery App",
@@ -18,10 +19,13 @@ export default function RootLayout({
     <html
       lang="en"
     >
-      <body className="bg-linear-to-b from-green-200 to-white w-full">
+      <body className="bg-linear-to-b min-h-screen from-green-200 to-white w-full">
         <Toaster position="top-right"/>
         <AuthProvider>
-          {children}
+          <StoreProvider>
+            <InitUser/>
+            {children}
+          </StoreProvider>
         </AuthProvider>
         </body>
     </html>

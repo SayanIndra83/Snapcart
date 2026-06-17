@@ -6,7 +6,8 @@ declare module "next-auth"{
         isVerified?: boolean,
         role?: string,
         username? : string,
-        mobile?: string
+        mobile?: string,
+        image?:string
     }
     interface Session{
         user:{
@@ -15,6 +16,7 @@ declare module "next-auth"{
         role?: string,
         username? : string
         mobile?: string
+        image?:string
         }& DefaultSession['user']
     }
 }
@@ -26,5 +28,6 @@ declare module "next-auth/jwt" {
         role?: string,
         username? : string,
         mobile?: string
+        image?:string
     }
 }

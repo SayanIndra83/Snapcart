@@ -8,15 +8,19 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { createPortal } from 'react-dom'
+import { IUser } from './EditRole'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 
-function Navbar() {
-    const {data: session, status} = useSession()
-    const user = session?.user
+function Navbar({user} : {user:IUser}) {
     const [loggingOut, setLoggingOut] = useState(false)
     const [open, setOpen] = useState(false)
     const [searchBarOpen, setSearchBarOpen] = useState(false)
     const [searchBarContent, setSearchBarContent] = useState("")
     const [menuOpen, setMenuOpen] = useState(false)
+    
+    const {cartData} = useSelector((state:RootState) => state.cart)
+    // console.log(cartData)
     const handleLogout = async () => {
         setLoggingOut(true)
         try {
@@ -198,11 +202,13 @@ function Navbar() {
         <Search className='h-6 w-6 text-green-600'/>
         </button>
         <Link
-        href={'/'}
+        href={'/user/cart'}
         className='relative bg-white rounded-full h-9 w-9 flex items-center justify-center shadow-md hover:sacle-103 transition-all'
         >
         <ShoppingCartIcon className='text-green-600 w-5 h-5'/>
-        <span className='absolute -top-1 -right-1 bg-red-500 rounded-full h-4 w-4 text-center text-xs text-white font-bold flex justify-center items-center shadow'>0</span>
+        <span className='absolute -top-1 -right-1 bg-red-500 rounded-full h-4 w-4 text-center text-xs text-white font-bold flex justify-center items-center shadow'>{
+       (cartData.length>0) ? (`${cartData.length}`) : ("0")
+        }</span>
         </Link>
         </>}
 

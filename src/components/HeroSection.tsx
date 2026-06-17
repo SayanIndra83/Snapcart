@@ -6,8 +6,12 @@ import img3 from '@/assets/order.jpg'
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import Image from "next/image"
+import { useSelector } from "react-redux"
+import { RootState } from "@/redux/store"
 
 function HeroSection() {
+  const {userData} = useSelector((state: RootState) => state.user)
+  // console.log(userData)
   const slides = [
     {
       id: 1,

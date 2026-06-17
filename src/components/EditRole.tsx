@@ -8,18 +8,26 @@ import { ArrowRight, Bike, Loader2, Phone, User, UserCog } from "lucide-react"
 import { redirect, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
+export interface IUser{
+        id?: string,
+        isVerified?: boolean,
+        role?: string,
+        username? : string
+        mobile?: string
+        image? : string
+}
 
-function EditRole() {
-    const {update, data: session} = useSession()
+function EditRole({user} : {user:IUser}) {
+    const {update} = useSession()
     const[isSubmitting, setIsSubmitting] = useState(false)
-    const [selectedRole, setSelectedRole] = useState(session?.user.role)
+    const [selectedRole, setSelectedRole] = useState(user.role)
     const userRole = [
          // "user" | "admin" | "deliveryboy"
         {id: "admin", label: "Admin", icon: UserCog},
         {id: "user", label: "User", icon: User},
         {id: "deliveryboy", label: "Delivery Boy", icon: Bike}
     ]
-    const[mobileNo, setMobileNo] = useState(session?.user.mobile)
+    const[mobileNo, setMobileNo] = useState(user.mobile)
     const [mobileError, setMobileError] = useState("")
     const router = useRouter()
 
@@ -53,7 +61,7 @@ function EditRole() {
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>
             toast.error(axiosError.response?.data?.message ?? "An unexpected error occured")
-            setSelectedRole(session?.user.role)
+            setSelectedRole(user.role)
         }
         finally{
             setIsSubmitting(false)

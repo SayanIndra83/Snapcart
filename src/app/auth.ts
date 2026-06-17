@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           ]})
   
           if(!existingUser){
-            throw new AuthError('Invalid combination')
+            throw new AuthError('User does not exist')
           }
           if(!existingUser?.isVerified){
             throw new AuthError("Please verify your account before login")
@@ -97,6 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user.isVerified = existingUser.isVerified
         user.username = existingUser.username
         user.mobile = existingUser.mobile
+        user.image = existingUser.userImage
       }
 
       return true

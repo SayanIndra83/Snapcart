@@ -1,4 +1,3 @@
-"use client";
 import AdminDashBoard from "@/components/AdminDashBoard";
 import DeliveryBoyDashBoard from "@/components/DeliveryBoyDashBoard";
 import EditRole from "@/components/EditRole";
@@ -6,24 +5,29 @@ import Navbar from "@/components/Navbar";
 import UserDashBoard from "@/components/UserDashBoard";
 import Welcome from "@/components/Welcome";
 import { useSession } from "next-auth/react";
+import Loader from "./loader";
+import dbConnect from "./lib/dbConnect";
+import { auth } from "./auth";
+import { Suspense } from "react";
 
-export default function Home() {
-  const { data: session, status } = useSession();
-  const user = session?.user;
-  console.log(session);
-  const mobile = user?.mobile;
-  const role = user?.role;
-  // console.log(session.data?.user.email
+export default async function Home() {
+await dbConnect()
+const session = await auth()
+const user = session?.user
+// console.log(user)
+const role = user?.role
+const mobile = user?.mobile
 
-  if (status === "loading") return <div>Loading...</div>;
 
   return (
-    <div className="relative">
-      {session?.user ? (!role || !mobile || (!mobile && role === "user") ? (
-          <EditRole />
+    <div className="relative min-h-screen">
+      <Suspense fallback={<Loader/>}>
+        {(session && user) ? 
+        (!role || !mobile || (!mobile && role === "user") ? (
+          <EditRole user = {user} />
         ) : (
           <>
-            <Navbar />
+            <Navbar user = {user}/>
             {user?.role === "user" ? (
               <UserDashBoard />
             ) : user.role === "admin" ? (
@@ -36,6 +40,7 @@ export default function Home() {
       ) : (
         <Welcome />
       )}
+      </Suspense>
     </div>
   );
 }

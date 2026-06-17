@@ -7,9 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest){
     const {role, mobile} = await req.json()
     // console.log({role, mobile})
-    await dbConnect()
+    
     try {
-        
+        await dbConnect()
         const session = await auth()
         if(!session || !session.user){
         return Response.json(

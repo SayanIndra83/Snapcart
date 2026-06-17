@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+
+.scrollbar-hide::-webkit-scrollbar{
+  display: none;
+}
 ::-webkit-scrollbar {
   width: 2px;
   height: 2px;
@@ -16,6 +20,6 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #1d9117; 
+  background: #156e11; 
 }
 
