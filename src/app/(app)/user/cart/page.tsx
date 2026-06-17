@@ -26,7 +26,7 @@ export default function CartPage() {
 
       transition={{ duration: 0.4 }}
 
-      className='flex flex-col items-center justify-center text-center py-16 px-6 gap-6 h-screen bg-white border border-gray-100 '
+      className='flex flex-col items-center justify-center text-center py-16 px-6 gap-6 h-screen border border-gray-100 '
 
     >
 
@@ -169,7 +169,7 @@ export default function CartPage() {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 lg:sticky lg:top-24 border border-gray-100"
+              className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl px-5 py-4 lg:sticky lg:top-24 border border-gray-100"
             >
               <h2 className="text-xl font-bold mb-6 text-gray-900">Order Summary</h2>
               
@@ -199,13 +199,13 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-center pb-2">
                   <span className="text-lg font-bold text-gray-900">To Pay</span>
-                  <span className="text-2xl font-black text-gray-900 tracking-tight">₹{finalTotal}</span>
+                  <span className="text-2xl font-black text-green-700 tracking-tight">₹{finalTotal}</span>
                 </div>
               </div>
 
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                className="w-full mt-6 bg-green-600 hover:bg-green-700 transition-colors duration-200 font-bold text-base text-white py-4 rounded-xl cursor-pointer shadow-lg shadow-green-600/20 flex items-center justify-center gap-2 group"
+                className="w-full mt-6 bg-green-600 hover:bg-green-700 transition-colors duration-200 font-semibold text-base text-white py-3 rounded-xl cursor-pointer shadow-lg shadow-green-600/20 flex items-center justify-center gap-2 group"
               >
                 Proceed to Checkout
                 <ArrowRight size={18} className='group-hover:translate-x-1 transition-all duration-200'/>
