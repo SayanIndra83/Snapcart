@@ -217,7 +217,38 @@ export default function Page() {
     }
   }
   const handleOnline = async()=>{
-
+    if(!position) return null
+    try {
+      setPaymentLoading(true)
+      const response = await axios.post("/api/user/place-order-online", {
+        paymentMethod, 
+        items: cartData.map((cart) => ({
+          grocery: cart._id,
+          price: cart.price,
+          unit:cart.unit,
+          image:cart.image,
+          quantity: cart.quantity,
+          name: cart.name
+        })),
+        totalAmount: finalTotal,
+        address:{
+          fullName: address.fullName,
+          city: address.city,
+          pincode: address.pincode,
+          state: address.state,
+          fullAddress: address.fullAddress,
+          mobile: address.mobile,
+          lattitude: position[0], 
+          longitude: position[1]
+        }
+      })
+      window.location.href = response?.data?.url
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>
+      toast.error(axiosError.response?.data.message ?? "Something went wrong")
+    }finally{
+      setPaymentLoading(false)
+    }
   }
   return (
     <div className="min-h-screen bg-gray-50/50 py-10 relative">

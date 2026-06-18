@@ -114,6 +114,7 @@ export default function CartPage() {
                     key= {idx}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                     exit={{ opacity: 0, x: -50, scale: 0.95 }}
                     className="flex p-3 sm:p-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 gap-4 group relative"
                   >
@@ -174,6 +175,7 @@ export default function CartPage() {
 
             <motion.div
               initial={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.5 }}
               animate={{ opacity: 1, x: 0 }}
               className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl px-5 py-4 lg:sticky lg:top-24 border border-gray-100"
             >

@@ -23,7 +23,8 @@ address:{
     lattitude: number, 
     longitude: number
 }
-status: "pending" | "out of delivery" | "delivered"
+status: "pending" | "out of delivery" | "delivered",
+isPaid: boolean
 }
 
 const orderSchema = new mongoose.Schema<IOrder>({
@@ -66,7 +67,11 @@ status:{
     default:"pending",
     enum:["pending", "out of delivery", "delivered"]
 },
-totalAmount : Number
+totalAmount : Number,
+isPaid: {
+    type: Boolean,
+    default:false
+}
 }, {timestamps: true})
 
 const OrderModel = (mongoose.models.Order as Model<IOrder> || mongoose.model<IOrder>("Order", orderSchema))
