@@ -1,10 +1,12 @@
 import { auth } from "@/app/auth";
+import dbConnect from "@/app/lib/dbConnect";
 import UserModel from "@/app/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req:NextRequest){
+export async function GET(req: NextRequest){
     try {
         const session = await auth()
+        // console.log(session)
         if(!session || !session.user){
             return NextResponse.json({
                 message: "Unauthinticated user",
@@ -14,8 +16,10 @@ export async function GET(req:NextRequest){
             })
         }
         const email = session.user.email
-        const user =  await UserModel.findOne({email}).select("-password -otp -verifycodeExpiry")
-
+        // console.log(email)
+        await dbConnect()
+        const user =  await UserModel.findOne({email})
+        // console.log(user)
         if(!user) return NextResponse.json({
                 message: "user does not exist",
                 success: false

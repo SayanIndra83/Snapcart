@@ -84,17 +84,23 @@ export default function CartPage() {
         <div className="w-[95%] sm:w-[90%] max-w-6xl mx-auto pt-8">
           
           <div className="flex items-center gap-4 mb-8">
-            <button
-              className="inline-flex text-gray-600 gap-2 items-center font-semibold text-sm group hover:text-green-700 transition-colors duration-200 cursor-pointer bg-white border border-gray-200 rounded-full p-2.5 sm:px-5 sm:py-2.5 shadow-sm hover:shadow-md"
-              onClick={() => router.push('/')}
-            >
-              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform duration-200" />
-              <span className="hidden sm:block">Continue Shopping</span>
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight ml-2">
-              Your Cart
-            </h1>
-            <span className="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-full text-sm ml-auto sm:ml-2">
+            <motion.button
+                        whileTap={{ scale: 0.96 }}
+                        className="inline-flex text-gray-700 gap-2 items-center font-semibold text-sm group hover:text-green-700 transition-colors duration-200 bg-white border border-gray-200 rounded-full px-4 py-1.5 sm:px-5 sm:py-2 shadow-sm hover:shadow-md cursor-pointer"
+                        onClick={(e) => router.push("/")}
+                      >
+                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                        <span className="hidden sm:block">Continue Shopping</span>
+                      </motion.button>
+            <motion.h1
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-2xl sm:text-4xl font-bold text-green-700 tracking-wide text-center"
+                      >
+                        Your Cart
+                      </motion.h1>
+            
+            <span className="bg-green-100 text-orange-500 font-bold px-3 py-1 mt-3 rounded-full text-sm ml-auto sm:ml-2">
               {cartData.length} items
             </span>
           </div>
@@ -129,7 +135,7 @@ export default function CartPage() {
                           <p className="text-xs text-gray-500 mt-1 font-medium">{item.unit}</p>
                         </div>
                         <button
-                          className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+                          className="text-red-500 sm:text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
                           onClick={() => dispatch(removeItem(item._id))}
                           aria-label="Remove item"
                         >
@@ -204,6 +210,7 @@ export default function CartPage() {
               </div>
 
               <motion.button
+                onClick={(e) => router.push('/user/checkout')}
                 whileTap={{ scale: 0.97 }}
                 className="w-full mt-6 bg-green-600 hover:bg-green-700 transition-colors duration-200 font-semibold text-base text-white py-3 rounded-xl cursor-pointer shadow-lg shadow-green-600/20 flex items-center justify-center gap-2 group"
               >
