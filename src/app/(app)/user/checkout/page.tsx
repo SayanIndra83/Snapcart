@@ -26,9 +26,10 @@ import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet"
 import { useSelector } from "react-redux";
 import "leaflet/dist/leaflet.css";
 import mapIcon from "@/assets/mapIcon.png";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import toast from "react-hot-toast";
+import { ApiResponse } from "@/app/types/ApiResponse";
 
 const markerIcon = new L.Icon({
   iconUrl: mapIcon.src,
@@ -75,7 +76,7 @@ const DraggableMarker = ({
 export default function Page() {
   const router = useRouter();
   const { userData } = useSelector((state: RootState) => state.user);
-  const {finalTotal, deliveryFee, subTotal} = useSelector((state: RootState) => state.cart);
+  const {finalTotal, deliveryFee, subTotal, cartData} = useSelector((state: RootState) => state.cart);
   const [address, setAddress] = useState({
     fullName: "",
     mobile: "",
@@ -89,6 +90,7 @@ export default function Page() {
   const [searchLoading, setSearchingLoading] = useState(false)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod")
+  const [paymentLoading, setPaymentLoading] = useState(false)
 
 //   useEffects
   useEffect(() => {
@@ -137,6 +139,7 @@ export default function Page() {
   useEffect(() => {
     if(!searchQuery) setSearchResults([])
   }, [searchQuery])
+
   const handleSearchQuery = async() => {
     setSearchingLoading(true)
     try {
@@ -177,6 +180,45 @@ export default function Page() {
     }
   }
 
+
+  const handleCOD = async()=>{
+    if(!position) return null
+    try {
+      setPaymentLoading(true)
+      const response = await axios.post("/api/user/place-order-cod", {
+        paymentMethod, 
+        items: cartData.map((cart) => ({
+          grocery: cart._id,
+          price: cart.price,
+          unit:cart.unit,
+          image:cart.image,
+          quantity: cart.quantity,
+          name: cart.name
+        })),
+        totalAmount: finalTotal,
+        address:{
+          fullName: address.fullName,
+          city: address.city,
+          pincode: address.pincode,
+          state: address.state,
+          fullAddress: address.fullAddress,
+          mobile: address.mobile,
+          lattitude: position[0], 
+          longitude: position[1]
+        }
+      })
+      toast.success(response?.data?.message || "Order placed")
+      router.push('/user/order-success')
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>
+      toast.error(axiosError.response?.data.message ?? "Something went wrong")
+    }finally{
+      setPaymentLoading(false)
+    }
+  }
+  const handleOnline = async()=>{
+
+  }
   return (
     <div className="min-h-screen bg-gray-50/50 py-10 relative">
       <div className="w-[95%] sm:w-[90%] max-w-6xl mx-auto">
@@ -444,12 +486,30 @@ export default function Page() {
               </div>
 
               <motion.button
-                onClick={(e) => router.push('/user/checkout')}
+                onClick={(e) => {
+                  e.preventDefault()
+                  if(paymentMethod === "cod") handleCOD()
+                  else handleOnline()
+                }}
                 whileTap={{ scale: 0.97 }}
-                className="w-full mt-6 bg-green-600 hover:bg-green-700 transition-colors duration-200 font-semibold text-base text-white py-3 rounded-xl cursor-pointer shadow-lg shadow-gray-300 flex items-center justify-center gap-2 group"
+                disabled={paymentLoading}
+                className="w-full mt-6 bg-green-600 hover:bg-green-700 transition-colors duration-200 font-semibold text-base text-white py-3 rounded-xl cursor-pointer shadow-lg shadow-gray-300 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
               >
-                {paymentMethod === 'cod' ? "Place Order" : "Proceed to Pay"}
+                {paymentLoading 
+                
+                ? (
+                  <>
+                  <Loader size={20} className="animate-spin"/>
+                  <span>processing ...</span>
+                  </>
+                ) 
+                
+                : (
+                  <>
+                  {(paymentMethod === 'cod' ) ? "Place Order" : "Proceed to Pay"}
                 <ArrowRight size={18} className='group-hover:translate-x-1 transition-transform'/>
+                </>
+                )}
               </motion.button>
             </motion.div>
             
