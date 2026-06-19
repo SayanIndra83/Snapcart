@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest){
     try {
         const session = await auth()
-        if(!session || !session.user){
+        if(!session || !session.user || session.user.role !== "user"){
         return Response.json(
             {
                 success: false,
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest){
 
     const {paymentMethod, totalAmount, address, items} = await req.json()
 
-    if(!paymentMethod || !totalAmount || !address || !items) 
+    if(!paymentMethod || !totalAmount || !address || !items.length) 
         return NextResponse.json({
         message: "All credententials required",
         success: false

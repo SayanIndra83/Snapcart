@@ -11,11 +11,12 @@ export async function proxy(request: NextRequest) {
 
 
     const {pathname} = request.nextUrl
-    const publicRoutes =  ['/','/sign-in', '/sign-up', '/api/auth', '/favicon.ico', '/_next']
-    const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path))
+    // console.log(pathname.startsWith("/admin"))
+    const publicRoutes =  ['/','/sign-in', '/sign-up','/verify', '/reset-password', '/api/auth', '/favicon.ico', '/_next']
+    const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/api/auth')
 
     if(isPublicRoute) {
-        // console.log("Private Route")
+        // console.log("Public Route")
         return NextResponse.next()}
     
     if(!token){
@@ -26,6 +27,7 @@ export async function proxy(request: NextRequest) {
     }
 
     const role = token.role
+    // console.log("Role", role)
 
     if((pathname.startsWith('/user') && role !== 'user') || (pathname.startsWith('/deliveryboy') && role !== "deliveryboy") || (pathname.startsWith('/admin') && role !== "admin")) {
       const unAuthorizedUrl = new URL('/unauthorized', request.url)
