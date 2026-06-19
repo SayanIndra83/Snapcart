@@ -123,7 +123,7 @@ export default function OrderSuccessPage() {
 
         {/* --- 4. Action Buttons --- */}
         <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 w-full sm:w-auto">
-          <Link href={"/user/my-order"} passHref className="w-full">
+          <Link href={"/user/my-orders"} passHref className="w-full">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.96 }}

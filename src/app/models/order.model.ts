@@ -1,6 +1,9 @@
 import mongoose, { Model } from "mongoose"
 export interface IOrder extends Document {
 user: mongoose.Types.ObjectId,
+_id?: mongoose.Types.ObjectId,
+createdAt?: Date,
+updatedAt?: Date,
 items:[
     {
         grocery: mongoose.Types.ObjectId,

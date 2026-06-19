@@ -120,12 +120,12 @@ function Navbar({user} : {user:IUser}) {
             </Link>
 
             <Link
-              href="/admin/manage"
+              href="/admin/manage-orders"
               onClick={() => setMenuOpen(false)}
               className='flex items-center gap-3 p-3 rounded-xl bg-white/10 active:scale-95 transition-all text-white/90 hover:text-white'
             >
               <ClipboardCheck className='h-5 w-5 text-green-300' />
-              <span>Manage Grocery</span>
+              <span>Manage Orders</span>
             </Link>
           </div>
 
@@ -236,12 +236,12 @@ function Navbar({user} : {user:IUser}) {
                 </Link>
 
                 <Link 
-                    href="/admin/manage" 
+                    href="/admin/manage-orders" 
                     className='group relative bg-white rounded-full flex items-center justify-center gap-2  shadow-md hover:scale-103 hover:bg-green-50 transition-all cursor-pointer font-semibold px-2.5 py-1.5 text-sm text-gray-700'
                 >
                     <ClipboardCheck className='h-4 w-4 text-green-600'/>
                     <span className='group-hover:text-green-700 transition-all duration-200'>
-                        Manage Grocery
+                        Manage Orders
                     </span>
                 </Link>
         </div>
@@ -326,7 +326,7 @@ function Navbar({user} : {user:IUser}) {
                     {
                         user?.role === "user" && (
                             <Link
-                    href={'/'}
+                    href={'/user/my-orders'}
                     onClick={() => setOpen(false)}
                     className='flex text-left items-center gap-3 w-full pl-3 pr-5 py-2 border rounded-2xl bg-green-50 hover:bg-green-100 hover:text-green-700 border-gray-100 overflow-hidden text-gray-700 font-medium text-sm group transition-all duration-200'>
                         <ShoppingBag className='text-green-600 h-5 w-5 group-hover:translate-x-1 transition-all duration-200'/>
