@@ -36,7 +36,7 @@ export async function GET(req: NextRequest){
     }
 
 
-    const orders = await OrderModel.find({}).populate("user")
+    const orders = await OrderModel.find({}).populate("user").sort({createdAt: -1})
 
 
     return Response.json(

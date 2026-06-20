@@ -1,6 +1,6 @@
 'use client'
 import { IOrder } from '@/app/models/order.model'
-import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck } from 'lucide-react'
+import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User } from 'lucide-react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -52,7 +52,7 @@ function UserOrderCard({order} : {order: IOrder}) {
             </span>
         </div>
       </div>
-      <div className='p-5 space-y-4'>
+      <div className='p-5 space-y-3 font-semibold'>
         {order.paymentMethod === "cod" 
         ? (
              <div className='flex items-center gap-2 text-gray-700 text-sm'>
@@ -68,8 +68,20 @@ function UserOrderCard({order} : {order: IOrder}) {
         <div
         className='flex items-center text-gray-700 gap-2 text-sm'
         >
+            <User size={16} className='text-green-600'/>
+            <span >{order.address.fullName}</span>
+        </div>
+        <div
+        className='flex items-center text-gray-700 gap-2 text-sm'
+        >
+            <Phone size={16} className='text-green-600'/>
+            <span >{order.address.mobile}</span>
+        </div>
+        <div
+        className='flex items-center text-gray-700 gap-2 text-sm'
+        >
             <MapPin size={16} className='text-red-600'/>
-            <span className='truncate'>{order.address.fullAddress}</span>
+            <span >{order.address.fullAddress}</span>
         </div>
 
         <div className='border-t border-gray-200 pt-3'>

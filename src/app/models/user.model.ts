@@ -1,6 +1,6 @@
 import mongoose, {Model, Schema, model, models} from "mongoose";
 
-export interface IUser extends Document{
+export interface IUser{
     username: string,
     email: string,
     password?: string,
@@ -10,6 +10,19 @@ export interface IUser extends Document{
     verifycodeExpiry:Date,
     isVerified: boolean,
     userImage?: string,
+    location ?: {
+        type: {
+        type: StringConstructor;
+        enum: string[];
+        default: string;
+    };
+    coordinates: {
+        type: NumberConstructor[];
+        default: number[];
+    };
+    },
+    isOnline : boolean,
+    socketId: string | null
 }
 
 const userSchema = new Schema<IUser>({
@@ -55,9 +68,30 @@ password:{
     userImage:{
         required: false,
         type: String
+    },
+    location: {
+    type: { 
+      type: String, 
+      enum: ['Point'], 
+      default: 'Point' 
+    },
+    coordinates: { 
+      type: [Number], 
+      default: [0, 0] 
+    },
+},
+    socketId:{
+        type: String,
+        default: null
+    },
+    isOnline:{
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 
+
+userSchema.index({location: "2dsphere"})
 
 const UserModel = (models.User as Model<IUser>) || model<IUser>("User", userSchema)
 

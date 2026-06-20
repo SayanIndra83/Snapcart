@@ -4,11 +4,11 @@ import EditRole from "@/components/EditRole";
 import Navbar from "@/components/Navbar";
 import UserDashBoard from "@/components/UserDashBoard";
 import Welcome from "@/components/Welcome";
-import { useSession } from "next-auth/react";
 import Loader from "./loader";
 import dbConnect from "./lib/dbConnect";
 import { auth } from "./auth";
 import { Suspense } from "react";
+import GeoUpdater from "@/components/GeoUpdater";
 
 export default async function Home() {
 await dbConnect()
@@ -28,6 +28,7 @@ const mobile = user?.mobile
         ) : (
           <>
             <Navbar user = {user}/>
+            <GeoUpdater/>
             {user?.role === "user" ? (
               <UserDashBoard />
             ) : user.role === "admin" ? (
