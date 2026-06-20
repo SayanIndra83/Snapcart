@@ -1,5 +1,6 @@
 import { auth } from "@/app/auth";
 import dbConnect from "@/app/lib/dbConnect";
+import emitEventHandler from "@/app/lib/emitEventHandler";
 import AssignmentModel from "@/app/models/delivery-assignment.model";
 import OrderModel from "@/app/models/order.model";
 import UserModel from "@/app/models/user.model";
@@ -57,7 +58,13 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
             }, {status: 404})
         }
 
-        existingOrder.status = status;
+        if(existingOrder.status === "out of delivery" || existingOrder.status === "delivered") {
+            return NextResponse.json({
+                message:"This action can't be performed",
+                sucess: false
+            }, {status: 400})
+        }
+
         // console.log(existingOrder)
         let deliveryBoysPayload: any = []
 
@@ -80,8 +87,10 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
 
             const busyIds = await AssignmentModel.find({
                 assignTo:{$in:nearbyIds},
-                status: "assigned"
-            }).distinct("assingTo")
+                status: {$nin: ["brodcasted", "completed"]}
+            }).distinct("assignTo")
+
+            console.log(busyIds)
 
             const busyIdSet = new Set(busyIds.map(b => String(b)))
 
@@ -103,21 +112,32 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
             status: "brodcasted"
         })
 
+
         existingOrder.assignment = deliveryAssignment._id
         
-        deliveryBoysPayload = availableDeliveryBoys.map((e) => {
-            name: e.username
-            phone: e.mobile
-            id: e._id
+        deliveryBoysPayload = availableDeliveryBoys.map((e) => ({
+            name: e.username,
+            phone: e.mobile,
+            id: e._id,
             position: e.location?.coordinates
-        })
+        }))
 
         await deliveryAssignment.populate("order")
+
+        for (const boy of availableDeliveryBoys) {
+            if (boy.socketId) {
+                await emitEventHandler("order-assign", deliveryAssignment , boy.socketId)
+            }
         }
+        }
+        existingOrder.status = status;
         await existingOrder.save()
         await existingOrder.populate("user")
 
-        console.log(existingOrder)
+        await emitEventHandler("order-status-update", {orderId: existingOrder._id.toString(), status: existingOrder.status})
+
+
+        // console.log(existingOrder)
         return NextResponse.json({
                 assigmet: existingOrder.assignment?._id,
                 availableBoys: deliveryBoysPayload,

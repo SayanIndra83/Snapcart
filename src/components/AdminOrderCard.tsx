@@ -1,4 +1,4 @@
-import { IOrder } from "@/app/models/order.model";
+import { IUser } from "@/app/models/user.model";
 import { ApiResponse } from "@/app/types/ApiResponse";
 import axios, { AxiosError } from "axios";
 import {
@@ -13,17 +13,52 @@ import {
   Phone,
   Truck,
   User,
+  UserCheck,
 } from "lucide-react";
+import mongoose from "mongoose";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+interface IOrder {
+  user: mongoose.Types.ObjectId;
+  _id?: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
+  items: [
+    {
+      grocery: mongoose.Types.ObjectId;
+      name: string;
+      price: string;
+      unit: string;
+      image: string;
+      quantity: number;
+    },
+  ];
+  totalAmount: number;
+  paymentMethod: "cod" | "online";
+  address: {
+    fullName: string;
+    city: string;
+    pincode: string;
+    state: string;
+    fullAddress: string;
+    mobile: string;
+    lattitude: number;
+    longitude: number;
+  };
+  status: "pending" | "out of delivery" | "delivered";
+  isPaid: boolean;
+  assignedDeliveryBoy?: IUser;
+  assignment?: mongoose.Types.ObjectId;
+}
 
 function AdminOrderCard({ order }: { order: IOrder }) {
   const statusMap = ["pending", "out of delivery"];
   const [expanded, setExpanded] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false)
-  const [orderStatus, setOrderStatus] = useState<String>(order.status);
+  const [orderStatus, setOrderStatus] = useState<String>("pending");
 //   console.log(order.status);
   const handleStatusUpdate = async (orderId: String, status: String) => {
     console.log(status)
@@ -47,6 +82,10 @@ function AdminOrderCard({ order }: { order: IOrder }) {
         setStatusUpdateLoading(false)
     }
   };
+
+  useEffect(() => {
+    setOrderStatus(order.status)
+  }, [order])
   
   return ( <>
             <motion.div
@@ -107,6 +146,22 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               </div>
             )}
           </p>
+
+          {order.assignedDeliveryBoy && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3 text-sm text-gray-700">
+                <UserCheck className="text-blue-600" size={18}/>
+                <div className="font-semibold text-gray-800">
+                  <p>Assigned to : <span>{order.assignedDeliveryBoy.username}</span></p>
+                  <p className="text-xs text-gray-600">📞+91 {order.assignedDeliveryBoy.mobile}</p>
+                </div>
+              </div>
+
+              <a href={`tel:+91${order.assignedDeliveryBoy.mobile}`} 
+              className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all duration-300"
+              >Call</a>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col items-start md:items-end gap-2">

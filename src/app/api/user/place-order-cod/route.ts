@@ -1,5 +1,6 @@
 import { auth } from "@/app/auth";
 import dbConnect from "@/app/lib/dbConnect";
+import emitEventHandler from "@/app/lib/emitEventHandler";
 import OrderModel from "@/app/models/order.model";
 import UserModel from "@/app/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -52,8 +53,14 @@ export async function POST(req: NextRequest){
 
     const newOrder = await OrderModel.create({
         user: existingUser._id,
-        items, paymentMethod, totalAmount, address
+        items,
+        paymentMethod, 
+        totalAmount, 
+        address
     })
+
+    await emitEventHandler( "new-order", newOrder)
+
 
     return NextResponse.json({
         newOrder,

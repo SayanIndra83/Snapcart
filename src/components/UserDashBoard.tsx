@@ -2,7 +2,7 @@ import HeroSection from './HeroSection'
 import CategorySlider from './CategorySlider'
 import dbConnect from '@/app/lib/dbConnect'
 import GroceryModel from '@/app/models/grocery.model'
-import GroceryItemCard, { IGrocery } from './GroceryItemCard'
+import GroceryItemCard from './GroceryItemCard'
 
 async function UserDashBoard() {
   await dbConnect()

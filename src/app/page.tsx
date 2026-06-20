@@ -1,5 +1,4 @@
 import AdminDashBoard from "@/components/AdminDashBoard";
-import DeliveryBoyDashBoard from "@/components/DeliveryBoyDashBoard";
 import EditRole from "@/components/EditRole";
 import Navbar from "@/components/Navbar";
 import UserDashBoard from "@/components/UserDashBoard";
@@ -9,6 +8,7 @@ import dbConnect from "./lib/dbConnect";
 import { auth } from "./auth";
 import { Suspense } from "react";
 import GeoUpdater from "@/components/GeoUpdater";
+import DeliveryBoy from "@/components/DeliveryBoy";
 
 export default async function Home() {
 await dbConnect()
@@ -34,7 +34,7 @@ const mobile = user?.mobile
             ) : user.role === "admin" ? (
               <AdminDashBoard />
             ) : (
-              <DeliveryBoyDashBoard />
+              <DeliveryBoy />
             )}
           </>
         )

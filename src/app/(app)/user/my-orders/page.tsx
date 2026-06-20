@@ -1,13 +1,46 @@
 'use client'
 import Loader from '@/app/loader'
-import { IOrder } from '@/app/models/order.model'
 import axios from 'axios'
 import { ArrowLeft, PackageSearch } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import UserOrderCard from '@/components/UserOrderCard'
+import mongoose from 'mongoose'
+import { IUser } from '@/app/models/user.model'
 
+interface IOrder {
+  user: mongoose.Types.ObjectId;
+  _id?: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
+  items: [
+    {
+      grocery: mongoose.Types.ObjectId;
+      name: string;
+      price: string;
+      unit: string;
+      image: string;
+      quantity: number;
+    },
+  ];
+  totalAmount: number;
+  paymentMethod: "cod" | "online";
+  address: {
+    fullName: string;
+    city: string;
+    pincode: string;
+    state: string;
+    fullAddress: string;
+    mobile: string;
+    lattitude: number;
+    longitude: number;
+  };
+  status: "pending" | "out of delivery" | "delivered";
+  isPaid: boolean;
+  assignedDeliveryBoy?: IUser;
+  assignment?: mongoose.Types.ObjectId;
+}
 
 function page() {
   const [loading, setLoading] = useState(false)

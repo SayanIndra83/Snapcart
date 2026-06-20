@@ -1,5 +1,6 @@
 import { auth } from "@/app/auth";
 import dbConnect from "@/app/lib/dbConnect";
+import emitEventHandler from "@/app/lib/emitEventHandler";
 import OrderModel from "@/app/models/order.model";
 import UserModel from "@/app/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -74,6 +75,8 @@ export async function POST(req: NextRequest){
         orderId: newOrder._id.toString()
     }
     })
+
+    await emitEventHandler( "new-order", newOrder)
 
     return NextResponse.json({
         url: stripeSession.url,

@@ -253,7 +253,7 @@ function Navbar({user} : {user:IUser}) {
         </>
     )}
         
-        {user?.role === "user" &&
+        {user?.role !== "admin" &&
         (
         <div
         className='relative'
