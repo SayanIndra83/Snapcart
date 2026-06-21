@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User
 import mongoose from 'mongoose'
 import { motion } from 'motion/react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 
@@ -61,6 +62,8 @@ function UserOrderCard({order} : {order: IOrder}) {
         else if(status === 'delivered') return "bg-green-100 text-green-700 border-green-300"
         else return "bg-gray-100 text-gray-700 border-gray-300"
     }
+
+    const router = useRouter()
 
   return (
     <motion.div
@@ -149,7 +152,13 @@ function UserOrderCard({order} : {order: IOrder}) {
 
                     </div>
 
-                    <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700 transition-all duration-300 cursor-pointer'>
+                    <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700 transition-all duration-300 cursor-pointer'
+                    onClick={(e) =>{
+                        e.preventDefault()
+                        router.push(`/user/track-order/${order._id?.toString()}`)
+                        
+                    }}
+                    >
                         <Truck size={16}/>
                         Track Your Order
                   </button>

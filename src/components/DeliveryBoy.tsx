@@ -1,5 +1,6 @@
+import DeliveryBoyDashBoard from "./DeliveryBoyDashBoard"
 
-import DeliveryBoyDashBoard from './DeliveryBoyDashBoard'
+
 
 function DeliveryBoy() {
   return (

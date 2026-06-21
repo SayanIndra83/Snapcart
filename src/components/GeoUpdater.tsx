@@ -7,7 +7,7 @@ import { useSelector } from "react-redux"
 
 function GeoUpdater() {
     const  socket = getSocket()
-    const {userData} = useSelector((state : RootState) => state.user)
+    const {userData} = useSelector((state : RootState) => state?.user)
   // console.log(userData?._id)
     useEffect(() =>{
     if(userData){

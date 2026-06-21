@@ -67,8 +67,16 @@ export async function POST(req:NextRequest) {
 
                 let status = ""
                 if(action === "reject"){
-                    assignment.brodcastedTo.filter((bid) => bid != deliveryBoy._id)
+                    const newAssignment = await AssignmentModel.findByIdAndUpdate(assignmentId, {
+                        $pull: {brodcastedTo: deliveryBoy._id}
+                    }, {new:true})
                     status = "Rejected"
+                    if(newAssignment && newAssignment.brodcastedTo.length === 0){
+                        const orderId = assignment.order
+                        await OrderModel.findByIdAndUpdate(orderId, {
+                        status: "pending"
+                    })
+                    }
                     await assignment.save()
                 }
                 if(action === 'accept'){
@@ -90,7 +98,6 @@ export async function POST(req:NextRequest) {
                         }, {status: 404})
                     }
 
-                    await order.save()
                     await assignment.save()
 
                     await AssignmentModel.updateMany({_id: {$ne: assignment._id},

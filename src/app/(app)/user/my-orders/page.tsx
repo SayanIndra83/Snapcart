@@ -1,7 +1,7 @@
 'use client'
 import Loader from '@/app/loader'
 import axios from 'axios'
-import { ArrowLeft, PackageSearch } from 'lucide-react'
+import { ArrowLeft, PackageSearch, ShoppingBag } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
@@ -42,18 +42,17 @@ interface IOrder {
   assignment?: mongoose.Types.ObjectId;
 }
 
-function page() {
+export default function Page() {
   const [loading, setLoading] = useState(false)
   const [myOrders, setMyOrders] = useState<IOrder[]>()
   const router = useRouter()
+
   useEffect(() => {
     const handleFetchOrders = async () => {
       setLoading(true)
       try {
         const response = await axios.get('/api/user/get-my-orders');
         setMyOrders(response.data.orders)
-        // console.log(response.data.orders)
-        // console.log(myOrders?.length)
       } catch (error) {
         console.log(error)
       }
@@ -68,46 +67,63 @@ function page() {
   if(loading){
     return <Loader/>
   }
+
   return (
-    <div className='min-h-screen  w-full'>
+    <div className='min-h-screen w-full'>
 
-      <div className='max-w-3xl mx-auto px-4 pt-16 pb-10 relative'>
-        <div className='fixed top-0 left-0 w-full backdrop-blur-lg bg-white/70 shadow-sm border-b z-50'>
-        <div className='max-w-3xl mx-auto flex items-center gap-4 px-4 py-3'>
-
-          <button className=' p-2 bg-gray-100 rounded-full hover:bg-gray-200 active:scale-97 transition-all duration-300 cursor-pointer'
-          onClick={() => router.push('/')}
+      <div className='sticky top-0 left-0 w-full backdrop-blur-xl bg-white/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-b border-gray-100 z-50'>
+        <div className='max-w-3xl mx-auto flex items-center gap-4 px-4 py-3.5'>
+          <button 
+            className='p-2 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center group'
+            onClick={() => router.push('/')}
           >
-            <ArrowLeft size={20} className='text-green-700'/>
+            <ArrowLeft size={18} className='text-gray-600 group-hover:text-gray-900'/>
           </button>
-          <h1 className='text-xl font-bold text-gray-800'>My Orders</h1>
+          <div className="flex flex-col">
+            <h1 className='text-lg sm:text-xl font-bold text-gray-900 leading-none'>My Orders</h1>
+            <span className="text-xs font-medium text-gray-500 mt-1">
+              {myOrders ? `${myOrders.length} order${myOrders.length === 1 ? '' : 's'} placed` : 'Loading...'}
+            </span>
+          </div>
         </div>
-        </div>
+      </div>
 
+      <div className='max-w-3xl mx-auto px-4 py-6 sm:py-8'>
         {myOrders?.length === 0 
         ? (
-          <>
-          <PackageSearch size={30} className='text-green-700'/>
-          <h2>No Order Found</h2>
-          <p>Start shopping to view orders here</p>
-          </>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className='flex flex-col items-center justify-center text-center mt-12 sm:mt-24 p-8 bg-white rounded-[32px] border border-dashed border-gray-200 shadow-sm max-w-md mx-auto'
+          >
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
+              <PackageSearch size={32} className='text-green-600' strokeWidth={1.5}/>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">No Orders Found</h2>
+            <p className="text-sm text-gray-500 leading-relaxed mb-8 px-4">
+              Looks like you haven't placed any orders yet. Start shopping to fill your pantry with fresh groceries!
+            </p>
+            
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => router.push('/')}
+              className='bg-green-600 text-white px-8 py-3.5 rounded-xl hover:bg-green-700 transition-colors duration-200 inline-flex items-center gap-2 font-semibold text-sm shadow-lg shadow-green-600/20 cursor-pointer'
+            >
+              <ShoppingBag size={18} />
+              Start Shopping
+            </motion.button>
+          </motion.div>
         ) : (
-          <div className='space-y-6 mt-4'>
+          <div className='space-y-6'>
             {
               myOrders?.map((order, idx) => (
                 <motion.div
-                initial={{
-                  opacity:0, y:20
-                }}
-                animate={{
-                  opacity:1, y:0
-                }}
-                transition={{
-                  duration:0.4
-                }}
+                initial={{ opacity:0, y:20 }}
+                animate={{ opacity:1, y:0 }}
+                transition={{ duration:0.4, delay: idx * 0.05 }} // Staggered entry animation
                 key={idx}
                 >
-                  <UserOrderCard order = {order}/>
+                  <UserOrderCard order={order}/>
                 </motion.div>
               ))
             }
@@ -118,5 +134,3 @@ function page() {
     </div>
   )
 }
-
-export default page

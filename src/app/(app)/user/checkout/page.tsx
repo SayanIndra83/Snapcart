@@ -410,7 +410,8 @@ export default function Page() {
                     scrollWheelZoom={true}
                     className="w-full h-full z-0"
                   >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
                     <DraggableMarker position={position} setPosition={setPosition} />
                   </MapContainer>
                 )}
