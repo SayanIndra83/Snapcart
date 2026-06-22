@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 
 function useGetMe() {
     const dispatch = useDispatch<AppDispatch>()
-  useEffect(() => {
+    useEffect(() => {
     const getMe = async () => {
         try {
             const response = await axios.get('/api/me')

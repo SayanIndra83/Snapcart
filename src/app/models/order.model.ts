@@ -29,7 +29,7 @@ export interface IOrder extends Document {
   status: "pending" | "out of delivery" | "delivered";
   isPaid: boolean;
   assignedDeliveryBoy?: mongoose.Types.ObjectId;
-  assignment?: mongoose.Types.ObjectId;
+  assignment : mongoose.Types.ObjectId | null;
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(

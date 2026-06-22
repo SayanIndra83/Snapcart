@@ -1,5 +1,6 @@
 import { auth } from "@/app/auth";
 import dbConnect from "@/app/lib/dbConnect";
+import emitEventHandler from "@/app/lib/emitEventHandler";
 import AssignmentModel from "@/app/models/delivery-assignment.model";
 import OrderModel from "@/app/models/order.model";
 import UserModel from "@/app/models/user.model";
@@ -42,6 +43,7 @@ export async function POST(req:NextRequest) {
                 }
 
                 const assignment = await AssignmentModel.findById(assignmentId)
+
                 if(!assignment || assignment?.status != "brodcasted"){
                     return NextResponse.json({
                         message: "Assignment not found or expired",
@@ -70,14 +72,19 @@ export async function POST(req:NextRequest) {
                     const newAssignment = await AssignmentModel.findByIdAndUpdate(assignmentId, {
                         $pull: {brodcastedTo: deliveryBoy._id}
                     }, {new:true})
-                    status = "Rejected"
-                    if(newAssignment && newAssignment.brodcastedTo.length === 0){
-                        const orderId = assignment.order
-                        await OrderModel.findByIdAndUpdate(orderId, {
-                        status: "pending"
-                    })
-                    }
                     await assignment.save()
+                    status = "Rejected"
+                    const orderId = assignment.order
+                    const assignedOrder = await OrderModel.findById(orderId);
+                    if(assignedOrder && newAssignment && newAssignment.brodcastedTo.length === 0){
+                    assignedOrder.status = "pending"
+                    assignedOrder.assignment = null
+                    await assignedOrder.save()
+                    await AssignmentModel.findByIdAndDelete(assignmentId)
+                    }
+
+                    await emitEventHandler("order-reject", {status : assignedOrder?.status.toString(), orderId})
+                    // await emitEventHandler("order-reject", assignedOrder)
                 }
                 if(action === 'accept'){
                     assignment.assignTo = deliveryBoy._id
@@ -89,7 +96,7 @@ export async function POST(req:NextRequest) {
                     const orderId = assignment.order
                     const order = await OrderModel.findByIdAndUpdate(orderId, {
                         assignedDeliveryBoy: deliveryBoy._id
-                    })
+                    }, {new: true})
 
                     if(!order){
                         return NextResponse.json({
@@ -106,6 +113,14 @@ export async function POST(req:NextRequest) {
                     }, {
                         $pull:{brodcastedTo: deliveryBoy._id}
                     })
+
+                    // await assignment.populate("order")
+                    // await emitEventHandler("order-accept", assignment)
+
+                    
+                    await order.populate("user assignedDeliveryBoy")
+                    await emitEventHandler("accept-order", order)
+                    
                 }
 
             return NextResponse.json({

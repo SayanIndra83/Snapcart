@@ -61,14 +61,21 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
         if(existingOrder.status === "out of delivery" || existingOrder.status === "delivered") {
             return NextResponse.json({
                 message:"This action can't be performed",
-                sucess: false
+                success: false
             }, {status: 400})
         }
 
         // console.log(existingOrder)
         let deliveryBoysPayload: any = []
 
-        if(status === "out of delivery" && !existingOrder.assignment){
+        if(status === "out of delivery" && existingOrder.assignment){
+            return NextResponse.json({
+                message: "Assignment already exists",
+                success: false
+            }, {status: 400})
+        }
+
+        
             const {lattitude, longitude} = existingOrder.address
             const nearByDeliveryBoys = await UserModel.find({
                 role: "deliveryboy",
@@ -90,7 +97,7 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
                 status: {$nin: ["brodcasted", "completed"]}
             }).distinct("assignTo")
 
-            console.log(busyIds)
+            // console.log(busyIds)
 
             const busyIdSet = new Set(busyIds.map(b => String(b)))
 
@@ -129,7 +136,9 @@ export async function POST(req:NextRequest, {params} : {params: Promise<{orderId
                 await emitEventHandler("order-assign", deliveryAssignment , boy.socketId)
             }
         }
-        }
+
+
+
         existingOrder.status = status;
         await existingOrder.save()
         await existingOrder.populate("user")

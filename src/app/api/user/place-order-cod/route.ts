@@ -59,6 +59,7 @@ export async function POST(req: NextRequest){
         address
     })
 
+    await newOrder.populate("user")
     await emitEventHandler( "new-order", newOrder)
 
 

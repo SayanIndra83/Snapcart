@@ -44,7 +44,7 @@ interface IOrder {
 }
 
 function Page() {
-    const [myOrders, setMyOrders] = useState<IOrder[]>()
+    const [myOrders, setMyOrders] = useState<IOrder[]>([])
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
@@ -53,6 +53,7 @@ function Page() {
             setLoading(true)
             try {
                 const response = await axios.get('/api/admin/get-all-orders')
+                // console.log(response.data.orders)
                 setMyOrders(response.data.orders)
             } catch (error) {
                 console.log(error)
@@ -67,7 +68,10 @@ function Page() {
     useEffect(():any => {
       const socket = getSocket()
       socket.on("new-order", (newOrder)=>{
+
+        // console.log(newOrder)
         setMyOrders((prev) => [newOrder, ...prev!])
+        // console.log(myOrders)
       })
       return () => socket.off("new-order")
     }, [])

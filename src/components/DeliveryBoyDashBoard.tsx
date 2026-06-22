@@ -11,6 +11,9 @@ import { useSelector } from "react-redux"
 import LiveMap from "./LiveMap"
 import { motion, AnimatePresence } from "motion/react"
 import { Check, MapPin, Package, Phone, User, X, Bike } from "lucide-react"
+import DeliveryChat from "./DeliveryChat"
+
+
 
 export interface ILocation {
   lattitude : number,
@@ -129,7 +132,7 @@ function DeliveryBoyDashBoard() {
     if(activeOrder && userLocation){
       return (
         <div className="min-h-screen bg-gray-50/50 pt-24 sm:pt-28 pb-8 px-4 sm:px-8">
-          <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+          <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
             
             <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
@@ -156,6 +159,7 @@ function DeliveryBoyDashBoard() {
               <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation}/>
             </div>
 
+            <DeliveryChat userId={activeOrder.user} orderId={activeOrder._id} deliveryBoyId={activeOrder.assignedDeliveryBoy}/>
           </div>
         </div>
       )

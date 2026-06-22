@@ -108,6 +108,8 @@ export default function Page() {
     }
   }, []);
 
+
+  // console.log(userData)
   useEffect(() => {
     if (userData) {
       setAddress((prev) => ({
@@ -318,7 +320,7 @@ export default function Page() {
                   type="text"
                   value={address.fullAddress}
                   placeholder="Complete Address"
-                  onChange={(e) => setAddress((prev) => ({ ...prev, fullAddress: e.target.value }))}
+                  readOnly
                   className="p-3.5 pl-11 w-full border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-green-500 transition-all outline-none"
                 />
               </div>
@@ -330,7 +332,7 @@ export default function Page() {
                     type="text"
                     value={address.city}
                     placeholder="City"
-                    onChange={(e) => setAddress((prev) => ({ ...prev, city: e.target.value }))}
+                   readOnly
                     className="p-3.5 pl-11 w-full border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-green-500 transition-all outline-none"
                   />
                 </div>
@@ -341,7 +343,7 @@ export default function Page() {
                     type="text"
                     value={address.state}
                     placeholder="State"
-                    onChange={(e) => setAddress((prev) => ({ ...prev, state: e.target.value }))}
+                    readOnly
                     className="p-3.5 pl-11 w-full border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-green-500 transition-all outline-none"
                   />
                 </div>
@@ -352,7 +354,7 @@ export default function Page() {
                     type="text"
                     value={address.pincode}
                     placeholder="Pincode"
-                    onChange={(e) => setAddress((prev) => ({ ...prev, pincode: e.target.value }))}
+                    readOnly
                     className="p-3.5 pl-11 w-full border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-green-500 transition-all outline-none"
                   />
                 </div>

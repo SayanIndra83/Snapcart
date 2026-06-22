@@ -76,6 +76,8 @@ export async function POST(req: NextRequest){
     }
     })
 
+    await newOrder.populate("user assignedDeliveryBoy")
+
     await emitEventHandler( "new-order", newOrder)
 
     return NextResponse.json({

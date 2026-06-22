@@ -44,18 +44,53 @@ interface IOrder {
 
 function UserOrderCard({order} : {order: IOrder}) {
     const [expanded, setExpanded] = useState(false)
-    const [status, setStatus] = useState(order.status)
+    const [status, setStatus] = useState<string>("pending");
+    const [currOrder, setCurrOrder] = useState<IOrder>(order);
+
+    useEffect(() => {
+        setStatus(order.status)
+    }, [order])
+
+
     useEffect(():any => {
         const socket = getSocket()
         socket.on("order-status-update", (data) => {
-            if(String(order._id) === data.orderId) {
+            if(String(currOrder._id) === data.orderId) {
                 // console.log(data.status)
                 setStatus(data.status)
             }
         })
 
-        return ()=> socket.off("oreder-status-update")
-    }, [])
+        return ()=> socket.off("order-status-update")
+    }, [currOrder._id])
+
+    useEffect(():any => {
+        const socket = getSocket()
+        socket.on("accept-order", (data) => {
+            // console.log(order)
+            if(String(currOrder._id) === String(data._id)) {
+                setCurrOrder(data)
+
+                // console.log(data)
+            }
+        })
+
+        return () => socket.off("accept-order")
+    }, [currOrder._id])
+    useEffect(():any => {
+        const socket = getSocket()
+        socket.on("order-reject", (data) => {
+            // console.log(order)
+            if(String(currOrder._id) === data.orderId) {
+                // console.log(data.status)
+                setStatus(data.status)
+            }
+        })
+
+        return () => socket.off("order-reject")
+    }, [currOrder._id])
+
+
     const getStatusColor = (status:string)=> {
         if(status === 'pending') return "bg-yellow-100 text-yello-700 border-yellow-300"
         else if(status === 'out of delivery') return "bg-blue-100 text-blue-700 border-blue-300"
@@ -80,18 +115,18 @@ function UserOrderCard({order} : {order: IOrder}) {
     >
       <div className='flex flex-col items-start justify-between md:flex-row md:items-center gap-3 border-b border-gray-100 bg-linear-to-r from-green-50 to-white px-5 py-4'>
         <div>
-            <h3 className='text-lg font-semibold text-gray-800'>Order <span className='text-green-700 font-bold'>#{(order?._id?.toString())?.slice(-6)}</span></h3>
-            <p className='text-xs text-gray-500 mt-1'>{new Date(order.createdAt!).toLocaleString()}</p>
+            <h3 className='text-lg font-semibold text-gray-800'>Order <span className='text-green-700 font-bold'>#{(currOrder?._id?.toString())?.slice(-6)}</span></h3>
+            <p className='text-xs text-gray-500 mt-1'>{new Date(currOrder.createdAt!).toLocaleString()}</p>
         </div>
         <div className='flex gap-2 flex-wrap items-center'>
             <span className={`px-3 py-1 text-xs font-semibold rounded-full border 
-                ${order.isPaid 
+                ${currOrder.isPaid 
                 ? (
                     "bg-green-100 text-green-700 border-green-300"
                 ) 
                 : ("bg-red-100 text-red-700 border-red-300")}
                 `}>
-                   {order.isPaid ? ("Paid") : ("Unpaid")} 
+                   {currOrder.isPaid ? ("Paid") : ("Unpaid")} 
             </span>
 
             <span className={`px-3 py-1 text-xs font-semibold rounded-full border capitalize 
@@ -104,7 +139,7 @@ function UserOrderCard({order} : {order: IOrder}) {
         </div>
       </div>
       <div className='p-5 space-y-3 font-semibold'>
-        {order.paymentMethod === "cod" 
+        {currOrder.paymentMethod === "cod" 
         ? (
              <div className='flex items-center gap-2 text-gray-700 text-sm'>
                     <Truck size={16} className='text-green-700'/> Cash on Delivery
@@ -120,33 +155,33 @@ function UserOrderCard({order} : {order: IOrder}) {
         className='flex items-center text-gray-700 gap-2 text-sm'
         >
             <User size={16} className='text-green-600'/>
-            <span >{order.address.fullName}</span>
+            <span >{currOrder.address.fullName}</span>
         </div>
         <div
         className='flex items-center text-gray-700 gap-2 text-sm'
         >
             <Phone size={16} className='text-green-600'/>
-            <span >{order.address.mobile}</span>
+            <span >{currOrder.address.mobile}</span>
         </div>
         <div
         className='flex items-center text-gray-700 gap-2 text-sm'
         >
             <MapPin size={16} className='text-red-600'/>
-            <span >{order.address.fullAddress}</span>
+            <span >{currOrder.address.fullAddress}</span>
         </div>
 
-        {order.assignedDeliveryBoy && (
+        {currOrder.assignedDeliveryBoy && (
             <>
                     <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3 text-sm text-gray-700">
                         <UserCheck className="text-blue-600" size={18}/>
                         <div className="font-semibold text-gray-800">
-                          <p>Assigned to : <span>{order.assignedDeliveryBoy.username}</span></p>
-                          <p className="text-xs text-gray-600">📞+91 {order.assignedDeliveryBoy.mobile}</p>
+                          <p>Assigned to : <span>{currOrder.assignedDeliveryBoy.username}</span></p>
+                          <p className="text-xs text-gray-600">📞+91 {currOrder.assignedDeliveryBoy.mobile}</p>
                         </div>
                       </div>
         
-                      <a href={`tel:+91${order.assignedDeliveryBoy.mobile}`} 
+                      <a href={`tel:+91${currOrder.assignedDeliveryBoy.mobile}`} 
                       className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all duration-300"
                       >Call</a>
 
@@ -155,7 +190,7 @@ function UserOrderCard({order} : {order: IOrder}) {
                     <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700 transition-all duration-300 cursor-pointer'
                     onClick={(e) =>{
                         e.preventDefault()
-                        router.push(`/user/track-order/${order._id?.toString()}`)
+                        router.push(`/user/track-order/${currOrder._id?.toString()}`)
                         
                     }}
                     >
@@ -180,7 +215,7 @@ function UserOrderCard({order} : {order: IOrder}) {
                     <ChevronUp size={16} className='text-green-600'/>
                     </>
                 ) : (<>
-                <span className='flex gap-3 items-center justify-center'> <Package size={16} className='text-green-600'/> View  {order.items.length} Items
+                <span className='flex gap-3 items-center justify-center'> <Package size={16} className='text-green-600'/> View  {currOrder.items.length} Items
                 </span>
                 <ChevronDown size={16} className='text-green-600'/>
                 </>)}
@@ -197,7 +232,7 @@ function UserOrderCard({order} : {order: IOrder}) {
                     className='overflow-hidden'
                     >
                         <div className='mt-3 space-y-3'>
-                            {order.items.map((item, idx) => (
+                            {currOrder.items.map((item, idx) => (
                                 <div 
                                 className='flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition-all duration-200'
                                 key={idx}>
@@ -227,7 +262,7 @@ function UserOrderCard({order} : {order: IOrder}) {
                                 <span>Delivery Status : <span className='text-green-700 font-semibold uppercase'>{status}</span></span>    
                                 </div>        
                                 <div>
-                                    Total: <span className='text-green-700 font-bold'>₹{order.totalAmount}</span>
+                                    Total: <span className='text-green-700 font-bold'>₹{currOrder.totalAmount}</span>
                                 </div>        
                             </div>
                         </div>

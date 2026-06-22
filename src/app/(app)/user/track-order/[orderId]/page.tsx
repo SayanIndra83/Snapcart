@@ -7,10 +7,13 @@ import { ApiResponse } from '@/app/types/ApiResponse'
 import { ILocation } from '@/components/DeliveryBoyDashBoard'
 import LiveMapCustomer from '@/components/LiveMapCustomer'
 import axios, { AxiosError } from 'axios'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Send } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
+import { motion } from 'motion/react'
+import { IMessage } from '@/app/models/Message.model'
 
 function Page({params} : {params: {orderId : string}}) {
   const [loading, setLoading] = useState(false)
@@ -26,6 +29,9 @@ function Page({params} : {params: {orderId : string}}) {
   const [deliveryBoy, setDeliveryBoy] = useState<IUser>()
   const {orderId} = useParams()
   const router = useRouter()
+  const [text, setText] = useState("")
+  const [messages, setMessages] = useState<IMessage[]>()
+  const chatBoxRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const trackOrder = async () => {
@@ -73,6 +79,67 @@ function Page({params} : {params: {orderId : string}}) {
 
     return ()=> socket.off("update-deliveryboy-location-live")
   }, [order])
+
+  // join room
+      useEffect(():any => {
+        if(order) {
+          const socket = getSocket()
+          socket.emit("join-room", order._id)
+
+          socket.on("send-message", (message) => {
+          if(message.roomId === order._id){
+          setMessages((prev) => [...prev!, message])}
+          })
+
+          return () => socket.off("send-message")
+        }
+      }, [order])   
+      
+      const sendMessage = () => {
+        if(!order) return 
+          const socket = getSocket()
+  
+          const message = {
+              roomId: order._id,
+              text, 
+              senderId: order?.user,
+              time: new Date().toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute:"2-digit"
+              })
+          }
+          socket.emit("send-message", message)
+          
+              
+          setText("")
+      }
+  
+      useEffect(() => {
+          const getAllMessages = async () => {
+              try {
+                  const response = await axios.get(`/api/chat/get-messages/${order!._id}`)
+                  setMessages(response.data.messages)
+                  // console.log(response)
+              } catch (error) {
+                  const axiosError = error as AxiosError<ApiResponse>
+  
+                  console.log(axiosError.response?.data.message)
+              }
+          }
+
+          if(order){
+            getAllMessages()
+          }
+          
+      }, [order])
+  
+      useEffect(() => {
+        chatBoxRef.current?.scrollTo({
+            top: chatBoxRef.current.scrollHeight,
+            behavior: "smooth"
+        })
+    }, [messages])
+
 
   if(loading) return (<Loader/>)
 
@@ -127,6 +194,66 @@ function Page({params} : {params: {orderId : string}}) {
           />
         </div>
       </div>
+
+
+      <div className='max-w-6xl mx-auto px-4 sm:px-8 py-6 sm:py-8'>
+
+<div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-4 h-[430px] flex flex-col" 
+      >
+
+        <div className="flex-1 overflow-y-auto p-2 space-y-3"
+        ref={chatBoxRef}
+        >
+            <AnimatePresence>
+               {messages?.map((message, idx) => (
+                <motion.div
+                key={idx}
+                initial={{
+                    opacity:0, y:15
+                }}
+                animate={{
+                    opacity: 1, y: 0
+                }}
+                exit={{
+                    opacity: 0
+                }}
+                transition={{
+                    duration: 0.2
+                }}
+
+                className={`flex 
+                    ${message.senderId === order?.user ? ("justify-end") : ("justify-start")}
+                    `}
+                >
+                    <div className={`px-4 py-2 max-w-[75%] rounded-2xl shadow-lg
+                        ${message.senderId === order?.user ? ("bg-green-600 text-white rounded-br-none") : ("bg-gray-100 text-gray-800 rounded-bl-none")}
+                        `}>
+                    <p className="text-sm font-medium">{message.text}</p>
+                    <p className="text-[10px] opacity-70 mt-1 text-right">{message.time}</p>
+                    </div>
+                    
+                </motion.div>
+               ))}
+            </AnimatePresence>
+        </div>
+
+        <div className=" flex gap-2 pt-3 mt-3">
+            <input 
+            type="text" 
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type a message..." 
+            className="flex-1 bg-gray-100 px-4 py-2 border border-gray-300/60 rounded-xl outline-none focus:ring-green-500 focus:ring-2" />
+            <button 
+            disabled={!text}
+            className="bg-green-600 hover:bg-green-700 transition-all duration-300 text-white rounded-xl py-1 px-5 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={sendMessage}
+            ><Send size={18}/></button>
+        </div>
+    </div>
+      </div>
+
+      
 
     </div>
   )

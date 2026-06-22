@@ -1,3 +1,4 @@
+import { getSocket } from "@/app/lib/socket";
 import { IUser } from "@/app/models/user.model";
 import { ApiResponse } from "@/app/types/ApiResponse";
 import axios, { AxiosError } from "axios";
@@ -59,6 +60,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false)
   const [orderStatus, setOrderStatus] = useState<String>("pending");
+  const [currOrder, setCurrOrder] = useState<IOrder>(order);
 //   console.log(order.status);
   const handleStatusUpdate = async (orderId: String, status: String) => {
     console.log(status)
@@ -85,8 +87,36 @@ function AdminOrderCard({ order }: { order: IOrder }) {
 
   useEffect(() => {
     setOrderStatus(order.status)
+    setCurrOrder(order)
   }, [order])
+
+   useEffect(():any => {
+          const socket = getSocket()
+          socket.on("order-reject", (data) => {
+              // console.log(order)
+              if(String(currOrder._id) === data.orderId) {
+                  // console.log(data.status)
+                  setOrderStatus(data.status)
+              }
+          })
   
+          return () => socket.off("order-reject")
+      }, [currOrder._id])
+
+      useEffect(():any => {
+              const socket = getSocket()
+              socket.on("accept-order", (data) => {
+                  // console.log(order)
+                  if(String(currOrder._id) === String(data._id)) {
+                      setCurrOrder(data)
+                      setOrderStatus(data.status)
+                  }
+              })
+      
+              return () => socket.off("accept-order")
+          }, [currOrder._id])
+
+
   return ( <>
             <motion.div
       initial={{
@@ -114,28 +144,28 @@ function AdminOrderCard({ order }: { order: IOrder }) {
         <div className="space-y-4">
           <p className="text-lg font-bold flex items-center gap-3 text-green-700">
             <PackageCheckIcon size={20} />
-            Order #{order._id?.toString().slice(-6)}
+            Order #{currOrder._id?.toString().slice(-6)}
           </p>
           <p className="text-gray-500 text-xs flex gap-4">
             <Clock size={16} className="text-orange-500" />{" "}
-            {new Date(order.createdAt!).toLocaleString()}
+            {new Date(currOrder.createdAt!).toLocaleString()}
           </p>
           <div className="mt-3 space-y-1 text-gray-700 text-sm">
             <p className="flex items-center gap-4 font-semibold">
               <User size={16} className="text-green-600" />
-              <span>{order.address.fullName}</span>
+              <span>{currOrder.address.fullName}</span>
             </p>
             <p className="flex items-center gap-4 font-semibold">
               <Phone size={16} className="text-green-600" />
-              <span>{order.address.mobile}</span>
+              <span>{currOrder.address.mobile}</span>
             </p>
             <p className="flex items-center gap-4 font-semibold">
               <MapPinIcon size={16} className="text-red-600" />
-              <span>{order.address.fullAddress}</span>
+              <span>{currOrder.address.fullAddress}</span>
             </p>
           </div>
           <p className="mt-3 flex items-center gap-4 font-medium">
-            {order.paymentMethod === "cod" ? (
+            {currOrder.paymentMethod === "cod" ? (
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <Truck size={16} className="text-green-700" /> Cash on Delivery
               </div>
@@ -147,17 +177,17 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             )}
           </p>
 
-          {order.assignedDeliveryBoy && (
+          {currOrder.assignedDeliveryBoy && (
             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3 text-sm text-gray-700">
                 <UserCheck className="text-blue-600" size={18}/>
                 <div className="font-semibold text-gray-800">
-                  <p>Assigned to : <span>{order.assignedDeliveryBoy.username}</span></p>
-                  <p className="text-xs text-gray-600">📞+91 {order.assignedDeliveryBoy.mobile}</p>
+                  <p>Assigned to : <span>{currOrder.assignedDeliveryBoy.username}</span></p>
+                  <p className="text-xs text-gray-600">📞+91 {currOrder.assignedDeliveryBoy.mobile}</p>
                 </div>
               </div>
 
-              <a href={`tel:+91${order.assignedDeliveryBoy.mobile}`} 
+              <a href={`tel:+91${currOrder.assignedDeliveryBoy.mobile}`} 
               className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all duration-300"
               >Call</a>
             </div>
@@ -169,13 +199,13 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             <span
               className={`text-xs font-semibold px-3 py-1 rounded-full capitalize
                     ${
-                      order.isPaid
+                      currOrder.isPaid
                         ? "bg-green-100 text-green-700 border-green-300"
                         : "bg-red-100 text-red-700 border-red-300"
                     }
                 `}
             >
-              {order.isPaid ? "Paid" : "Unpaid"}
+              {currOrder.isPaid ? "Paid" : "Unpaid"}
             </span>
             <span
               className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${
@@ -195,7 +225,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             value={orderStatus.toUpperCase()}
             onChange={(e) =>
               handleStatusUpdate(
-                order._id?.toString()!,
+                currOrder._id?.toString()!,
                 e.target.value.toLowerCase(),
               )
             }
@@ -226,7 +256,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               <span className="flex gap-3 items-center justify-center">
                 {" "}
                 <Package size={16} className="text-green-600" /> View{" "}
-                {order.items.length} Items
+                {currOrder.items.length} Items
               </span>
               <ChevronDown size={16} className="text-green-600" />
             </>
@@ -245,7 +275,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
           className="overflow-hidden"
         >
           <div className="mt-3 space-y-3">
-            {order.items.map((item, idx) => (
+            {currOrder.items.map((item, idx) => (
               <div
                 className="flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition-all duration-200"
                 key={idx}
@@ -282,14 +312,14 @@ function AdminOrderCard({ order }: { order: IOrder }) {
                 <span>
                   Delivery Status :{" "}
                   <span className="text-green-700 font-semibold uppercase">
-                    {order.status}
+                    {orderStatus}
                   </span>
                 </span>
               </div>
               <div>
                 Total:{" "}
                 <span className="text-green-700 font-bold">
-                  ₹{order.totalAmount}
+                  ₹{currOrder.totalAmount}
                 </span>
               </div>
             </div>
