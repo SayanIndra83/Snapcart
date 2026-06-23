@@ -116,6 +116,16 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               return () => socket.off("accept-order")
           }, [currOrder._id])
 
+          useEffect(():any => {
+        const socket = getSocket()
+        socket.on("order-delivered", (data) =>{
+            if(data._id === currOrder._id){
+                setCurrOrder(data)
+                setOrderStatus(data.status)
+            }
+        })
+        return () => socket.off("order-delivered")
+    }, [currOrder._id])
 
   return ( <>
             <motion.div
@@ -219,8 +229,8 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               {orderStatus}
             </span>
           </div>
-
-          <select
+          {currOrder.status !== "delivered" &&
+            <select
             className="border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm hover:border-green-400 transition focus:outline-none focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
             value={orderStatus.toUpperCase()}
             onChange={(e) =>
@@ -234,6 +244,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               <option key={idx}>{st.toUpperCase()}</option>
             ))}
           </select>
+          }
         </div>
       </div>
 

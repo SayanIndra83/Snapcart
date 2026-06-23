@@ -72,7 +72,7 @@ function Navbar({user} : {user:IUser}) {
               Admin Panel
             </h1>
             <button
-              className='text-white/80 hover:text-red-400 hover:rotate-90 text-2xl font-bold transition-all duration-300'
+              className='text-white/80 hover:text-red-400 hover:rotate-90 text-2xl font-bold transition-all duration-300 cursor-pointer'
               onClick={() => setMenuOpen(false)}
             >
               <X />
@@ -133,7 +133,7 @@ function Navbar({user} : {user:IUser}) {
             <button
               disabled={loggingOut}
               onClick={handleLogout}
-              className='flex items-center gap-3 w-full pl-3 pr-5 py-2 bg-red-50 border border-gray-500/20 rounded-xl  text-red-500 font-medium transition-all group disabled:opacity-50 disabled:cursor-not-allowed'
+              className='flex items-center gap-3 w-full pl-3 pr-5 py-2 bg-red-50 border border-gray-500/20 rounded-xl  text-red-500 font-medium transition-all group disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
             >
               {loggingOut ? (
                 <>
@@ -245,7 +245,7 @@ function Navbar({user} : {user:IUser}) {
                     </span>
                 </Link>
         </div>
-        <div className='md:hidden bg-white rounded-full w-8 h-8 items-center justify-center flex shadow-md'
+        <div className='md:hidden bg-white rounded-full w-8 h-8 items-center justify-center flex shadow-md cursor-pointer'
         onClick={() => setMenuOpen(prev => (!prev))}
         >
             <Menu className='text-green-600 h-4 w-4'/>

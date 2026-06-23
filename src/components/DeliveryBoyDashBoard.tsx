@@ -10,7 +10,7 @@ import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
 import LiveMap from "./LiveMap"
 import { motion, AnimatePresence } from "motion/react"
-import { Check, MapPin, Package, Phone, User, X, Bike } from "lucide-react"
+import { Check, MapPin, Package, Phone, User, X, Bike, Loader2 } from "lucide-react"
 import DeliveryChat from "./DeliveryChat"
 
 
@@ -43,6 +43,10 @@ function DeliveryBoyDashBoard() {
     lattitude: 0, longitude: 0
   })
   const {userData} = useSelector((state : RootState) => state.user!)
+  const [isOtpSent, setIsOtpSent] = useState(false)
+  const [otp, setOtp] = useState("")
+  const [isSendingOtp, setIsSendingOtp] = useState(false)
+  const [isMarking, setIsMarking] = useState(false)
 
   const assignmentFetch = async () => {
         setLoading(true)
@@ -109,6 +113,21 @@ function DeliveryBoyDashBoard() {
         return()=> navigator.geolocation.clearWatch(watcher) 
     }, [userData?._id])
 
+    useEffect((): any => {
+      const socket = getSocket()
+
+      socket.on("update-deliveryboy-location-live", ({userId, location}) => {
+        if(String(userId) === String(userData?._id)){
+          setDeliveryBoyLocation({
+            lattitude: location.coordinates[1],
+            longitude:  location.coordinates[0]
+          })
+        }
+      })
+
+      return () => socket.off("update-deliveryboy-location-live")
+    }, [])
+
     const handleAccept = async (action: string, assignmentId: mongoose.Types.ObjectId) => {
       try {
         const response = await axios.post('/api/deliveryboy/accept-assignment', {assignmentId, action})
@@ -125,6 +144,35 @@ function DeliveryBoyDashBoard() {
         const axiosError = error as AxiosError<ApiResponse>
           // toast.error(axiosError.response?.data?.message!)
           console.log(axiosError.response?.data?.message)
+      }
+    }
+
+    const handleSendOtp = async () => {
+      setIsSendingOtp(true)
+      try {
+        const response = await axios.post(`/api/deliveryboy/otp/send-otp/${activeOrder._id}`)
+        toast.success(response.data.message)
+        setIsOtpSent(true)
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponse>
+          toast.error(axiosError.response?.data?.message!)
+      }finally{
+        setIsSendingOtp(false)
+      }
+    }
+    
+    const handleMarkAsDelivered = async () => {
+      setIsMarking(true)
+      try {
+        const response = await axios.post(`/api/deliveryboy/otp/verify-delivery-otp/${activeOrder._id}`, {otp})
+        toast.success(response.data.message)
+        setActiveOrder(null)
+        await fetchActiveAssignment()
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponse>
+          toast.error(axiosError.response?.data?.message!)
+      }finally{
+        setIsMarking(false)
       }
     }
 
@@ -161,6 +209,58 @@ function DeliveryBoyDashBoard() {
             </div>
 
             <DeliveryChat userId={activeOrder.user} orderId={activeOrder._id} deliveryBoyId={activeOrder.assignedDeliveryBoy}/>
+
+            <div className="mt-6 bg-white rounded-2xl border border-gray-200 shadow p-6">
+              {isOtpSent 
+              ? (
+              <div className=" flex flex-col items-center justify-center gap-5">
+                <input 
+                type="text"
+                inputMode="numeric"
+                maxLength={4}
+                value={otp}
+                onChange={(e) => {
+                  setOtp(e.target.value.replace(/\D/g, ""))
+                }}
+                placeholder="Enter OTP"
+                className="focus:outline-none w-full border-1 border-gray-300 rounded-2xl bg-transparent px-5 py-3 text-gray-800 focus:ring-2 focus:ring-green-500"
+                />
+                <button
+                disabled = {otp.length !== 4 || isMarking}
+                className="w-full py-3 bg-green-600 text-white cursor-pointer rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-700 hover:bg-green-700 transition-all duration-300 active:sclae-97 flex gap-4 items-center justify-center"
+                onClick={handleMarkAsDelivered}
+                >
+                  {isMarking ? (
+                    <>
+                    <Loader2 size={20} className="animate-spin text-gray-700"/> Marking...
+                    </>
+                    
+                  ) : ("Mark as Delivered")}
+                  </button>
+              </div>
+              ) 
+              : (
+               <>
+              <button
+              disabled = {isSendingOtp}
+              className="w-full py-3 bg-green-600 text-white cursor-pointer rounded-2xl disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-700 flex gap-4 items-center justify-center hover:bg-green-700 transition-all duration-300 active:sclae-97"
+              onClick={handleSendOtp}
+              >{isSendingOtp ? (
+                    <>
+                    <Loader2 size={20} className="animate-spin text-gray-700"/> Sending...
+                    </>
+                    
+                  ) : ("Send OTP")}
+                  </button>
+              </> 
+              )}
+
+              {activeOrder.isOtpVerified && (
+                <div className="text-green-700 text-center font-bold">
+                  Delivery Completed !
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )

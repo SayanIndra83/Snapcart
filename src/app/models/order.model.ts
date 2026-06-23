@@ -1,4 +1,5 @@
 import mongoose, { Model } from "mongoose";
+import { date } from "zod";
 export interface IOrder extends Document {
   user: mongoose.Types.ObjectId;
   _id?: mongoose.Types.ObjectId;
@@ -28,8 +29,11 @@ export interface IOrder extends Document {
   };
   status: "pending" | "out of delivery" | "delivered";
   isPaid: boolean;
-  assignedDeliveryBoy?: mongoose.Types.ObjectId;
-  assignment : mongoose.Types.ObjectId | null;
+  assignedDeliveryBoy: mongoose.Types.ObjectId | null;
+  assignment: mongoose.Types.ObjectId | null;
+  deliveryOtp: string | null;
+  isOtpVerified: boolean;
+  deliveredAt ?: Date,
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(
@@ -85,13 +89,24 @@ const orderSchema = new mongoose.Schema<IOrder>(
     assignment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Assign",
+      default: null,
+    },
+    deliveryOtp:{
+      type: String,
+      length: [4, "Otp must be of 4 length"],
       default: null
     },
+    isOtpVerified:{
+      type: Boolean,
+      default: false
+    },
+    deliveredAt: Date
   },
   { timestamps: true },
 );
 
 const OrderModel =
-  (mongoose.models.Order as Model<IOrder>) || mongoose.model<IOrder>("Order", orderSchema);
+  (mongoose.models.Order as Model<IOrder>) ||
+  mongoose.model<IOrder>("Order", orderSchema);
 
 export default OrderModel;

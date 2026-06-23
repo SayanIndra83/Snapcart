@@ -90,6 +90,17 @@ function UserOrderCard({order} : {order: IOrder}) {
         return () => socket.off("order-reject")
     }, [currOrder._id])
 
+    useEffect(():any => {
+        const socket = getSocket()
+        socket.on("order-delivered", (data) =>{
+            if(data._id === currOrder._id){
+                setCurrOrder(data)
+                setStatus(data.status)
+            }
+        })
+        return () => socket.off("order-delivered")
+    }, [currOrder._id])
+
 
     const getStatusColor = (status:string)=> {
         if(status === 'pending') return "bg-yellow-100 text-yello-700 border-yellow-300"

@@ -19,7 +19,7 @@ export default function RootLayout({
     <html
       lang="en"
     >
-      <body className="bg-linear-to-b min-h-screen from-green-200 to-white w-full">
+      <body className="bg-linear-to-b min-h-screen from-green-100 to-white w-full">
         <Toaster position="top-right"/>
         <AuthProvider>
           <StoreProvider>

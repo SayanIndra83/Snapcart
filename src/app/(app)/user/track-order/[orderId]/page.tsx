@@ -7,7 +7,7 @@ import { ApiResponse } from '@/app/types/ApiResponse'
 import { ILocation } from '@/components/DeliveryBoyDashBoard'
 import LiveMapCustomer from '@/components/LiveMapCustomer'
 import axios, { AxiosError } from 'axios'
-import { ArrowLeft, Loader2, Send, Sparkle, Loader } from 'lucide-react'
+import { ArrowLeft, Loader2, Send, Sparkle, Loader, CheckCircle2, PackageCheck } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -26,7 +26,7 @@ function Page({params} : {params: {orderId : string}}) {
   })
   
   const [order, setOrder] = useState<IOrder>()
-  const [deliveryBoy, setDeliveryBoy] = useState<IUser>()
+  const [deliveryBoy, setDeliveryBoy] = useState<IUser |null>()
   const {orderId} = useParams()
   const router = useRouter()
   const [text, setText] = useState("")
@@ -163,6 +163,22 @@ function Page({params} : {params: {orderId : string}}) {
         }
     }
 
+    useEffect((): any => {
+      const socket = getSocket()
+      socket.on("order-delivered", (data) => {
+        if(String(data._id) === orderId){
+          setOrder(data)
+          setDeliveryBoy(null)
+          setDeliveryBoyLocation({
+            lattitude: 0,
+            longitude: 0
+          })
+        }
+      })
+
+      return ()=> socket.off("order-delivered")
+    },[order])
+
   if(loading) return (<LoaderBox/>)
 
   return (
@@ -182,12 +198,13 @@ function Page({params} : {params: {orderId : string}}) {
             <h1 className='text-lg sm:text-xl font-bold text-gray-900 leading-none'>Track My Order</h1>
             
             <div className='flex flex-wrap items-center gap-2 sm:gap-3'>
-              {order && deliveryBoy ? (
+              {order ? (
                 <>
                   <span className='inline-flex items-center text-gray-600 font-medium gap-1.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-lg'>
                     <b>🗒️ Order</b>
                     <span className='text-red-500 font-semibold'>#{order?._id?.toString().slice(-6)}</span>
                   </span>
+                  {deliveryBoy && 
                   
                   <span className='text-gray-700 inline-flex gap-1.5 font-medium text-xs sm:text-sm bg-green-50 border border-green-100 rounded-lg py-1.5 px-2.5 items-center'>
                     🛵 Partner:
@@ -195,6 +212,8 @@ function Page({params} : {params: {orderId : string}}) {
                       {deliveryBoy?.username}
                     </span>
                   </span>
+
+                  }
                 </>
               ) : order ? (
                 <span className='inline-flex items-center gap-2 text-xs sm:text-sm text-orange-600 font-medium bg-orange-50 border border-orange-100 px-3 py-1.5 rounded-lg'>
@@ -207,8 +226,58 @@ function Page({params} : {params: {orderId : string}}) {
 
         </div>
       </div>
+      
+      {
 
-      <div className='max-w-6xl mx-auto px-4 sm:px-8 py-6 sm:py-8'>
+        order?.status === "delivered" ? (
+          <div className='max-w-3xl mx-auto px-4 sm:px-8 py-12 sm:py-20'>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-12 text-center flex flex-col items-center justify-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-green-50/50 to-transparent"></div>
+              
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 relative z-10"
+              >
+                <PackageCheck size={44} className="text-green-600" />
+                <motion.div 
+                   initial={{ scale: 0 }}
+                   animate={{ scale: 1 }}
+                   transition={{ delay: 0.5, type: "spring" }}
+                   className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm"
+                >
+                  <CheckCircle2 size={24} className="text-green-500 fill-green-50" />
+                </motion.div>
+              </motion.div>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 relative z-10">
+                Order Delivered Successfully!
+              </h2>
+              
+              <p className="text-gray-500 max-w-md mx-auto mb-8 relative z-10 text-sm sm:text-base leading-relaxed">
+                Your order <span className="font-semibold text-gray-700">#{order?._id?.toString().slice(-6)}</span> has securely reached its destination. Thank you for shopping with us!
+              </p>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => router.push('/user/my-orders')}
+                className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium shadow-lg shadow-green-600/20 hover:bg-green-700 transition-colors relative z-10 cursor-pointer"
+              >
+                View All Orders
+              </motion.button>
+            </motion.div>
+          </div>
+        ) 
+        
+        : (
+          <>
+          <div className='max-w-6xl mx-auto px-4 sm:px-8 py-6 sm:py-8'>
         <div className="rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6 bg-white">
           <LiveMapCustomer 
              userLocation={userLocation} 
@@ -220,7 +289,7 @@ function Page({params} : {params: {orderId : string}}) {
 
       <div className='max-w-6xl mx-auto px-4 sm:px-8 py-6 sm:py-8'>
 
-<div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-4 h-[430px] flex flex-col" 
+      <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-4 h-[430px] flex flex-col" 
       >
 
 
@@ -303,6 +372,9 @@ function Page({params} : {params: {orderId : string}}) {
         </div>
     </div>
       </div>
+          </>
+        )
+      }
 
       
 
