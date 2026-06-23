@@ -4,7 +4,7 @@ import { getSocket } from "@/app/lib/socket"
 import { IMessage } from "@/app/models/Message.model"
 import { ApiResponse } from "@/app/types/ApiResponse"
 import axios, { AxiosError } from "axios"
-import { Send } from "lucide-react"
+import { Loader, Send, Sparkle } from "lucide-react"
 import mongoose from "mongoose"
 import { AnimatePresence } from "motion/react"
 import { useEffect, useRef, useState } from "react"
@@ -21,7 +21,10 @@ function DeliveryChat({userId, deliveryBoyId, orderId}: IChat) {
     const [text, setText] = useState("")
     const [messages, setMessages] = useState<IMessage[]>()
     const chatBoxRef = useRef<HTMLDivElement> (null)
-
+    const [suggestions, setSuggestions] = useState([
+        "Hello", "Thank you", "Where are you"
+    ])
+    const [suggestionLoading, setSuggestionLoading] = useState(false)
     // join room
     useEffect(():any => {
         const socket = getSocket()
@@ -77,9 +80,55 @@ function DeliveryChat({userId, deliveryBoyId, orderId}: IChat) {
         })
     }, [messages])
 
-    
+
+    const suggestMessage = async () => {
+        setSuggestionLoading(true)
+        try {
+            const lastMessage = messages?.filter((m => m.senderId !== deliveryBoyId)).at(-1)
+            const response = await axios.post(`/api/chat/ai-suggestion`, {
+                message: lastMessage?.text,
+                role: "delivery_boy"
+            })
+            setSuggestions(response.data.data.candidates[0].content.parts[0].text.split(","))
+        } catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>
+            console.log(axiosError.response?.data.message)
+        }finally{
+            setSuggestionLoading(false)
+        }
+    }
   return (
     <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-4 h-[430px] flex flex-col">
+
+
+        <div className="flex justify-between items-center mb-3">
+            <span className="font-semibold text-gray-700 text-sm">AI suggestions</span>
+            <motion.button
+            whileTap={{scale: 0.9}}
+            className="px-3 py-1 text-xs flex items-center gap-1 bg-purple-100 text-purple-700 rounded-full shadow-sm border border-purple-200 cursor-pointer disabled:cursor-not-allowed"
+            onClick={suggestMessage}
+            disabled={suggestionLoading}
+            >
+                <Sparkle size={18}/>
+                {suggestionLoading ? (<Loader size={20} className='animate-spin'/>) : ("Suggest Replies")}
+                </motion.button>
+        </div>
+
+        <div className="flex gap-2 flex-wrap mb-3">
+            {suggestions.map((suggestion, idx) => (
+                <motion.div
+                key={idx}
+                whileTap={{scale: 0.92}}
+                className="px-3 py-1 text-xs bg-green-50 border-green-200 text-green-700 rounded-full cursor-pointer"
+                onClick={(e) =>{
+                    setText(suggestion)
+                }}
+                >
+                    {suggestion}
+                </motion.div>
+            ))}
+        </div>
+
 
         <div className="flex-1 overflow-y-auto p-2 space-y-3"
         ref={chatBoxRef}

@@ -1,13 +1,13 @@
 'use client'
 import { getSocket } from '@/app/lib/socket'
-import Loader from '@/app/loader'
+import LoaderBox from '@/app/loader'
 import { IOrder } from '@/app/models/order.model'
 import { IUser } from '@/app/models/user.model'
 import { ApiResponse } from '@/app/types/ApiResponse'
 import { ILocation } from '@/components/DeliveryBoyDashBoard'
 import LiveMapCustomer from '@/components/LiveMapCustomer'
 import axios, { AxiosError } from 'axios'
-import { ArrowLeft, Loader2, Send } from 'lucide-react'
+import { ArrowLeft, Loader2, Send, Sparkle, Loader } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -32,7 +32,12 @@ function Page({params} : {params: {orderId : string}}) {
   const [text, setText] = useState("")
   const [messages, setMessages] = useState<IMessage[]>()
   const chatBoxRef = useRef<HTMLDivElement>(null)
+  const [suggestions, setSuggestions] = useState([
+        "Hello", "Thank you", "Where are you"
+    ])
 
+  const [suggestionLoading, setSuggestionLoading] = useState(false)
+  
   useEffect(() => {
     const trackOrder = async () => {
       setLoading(true)
@@ -140,8 +145,25 @@ function Page({params} : {params: {orderId : string}}) {
         })
     }, [messages])
 
+    const suggestMessage = async () => {
+      setSuggestionLoading(true)
+        try {
+            const lastMessage = messages?.filter((m => m.senderId !== order?.user)).at(-1)
+            const response = await axios.post(`/api/chat/ai-suggestion`, {
+                message: lastMessage?.text,
+                role: "user"
+            })
+            console.log(response.data.data)
+            setSuggestions(response.data.data.candidates[0].content.parts[0].text.split(","))
+        } catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>
+            console.log(axiosError.response?.data.message)
+        }finally{
+          setSuggestionLoading(false)
+        }
+    }
 
-  if(loading) return (<Loader/>)
+  if(loading) return (<LoaderBox/>)
 
   return (
     <div className="min-h-screen w-full">
@@ -200,6 +222,35 @@ function Page({params} : {params: {orderId : string}}) {
 
 <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-4 h-[430px] flex flex-col" 
       >
+
+
+         <div className="flex justify-between items-center mb-3">
+            <span className="font-semibold text-gray-700 text-sm">AI suggestions</span>
+            <motion.button
+            whileTap={{scale: 0.9}}
+            className="px-3 py-1 text-xs flex items-center gap-1 bg-purple-100 text-purple-700 rounded-full shadow-sm border border-purple-200 cursor-pointer disabled:cursor-not-allowed"
+            onClick={suggestMessage}
+            disabled={suggestionLoading}
+            >
+                <Sparkle size={18}/>
+                {suggestionLoading ? (<Loader size={20} className='animate-spin'/>) : ("Suggest Replies")}
+                </motion.button>
+        </div>
+
+        <div className="flex gap-2 flex-wrap mb-3">
+            {suggestions.map((suggestion, idx) => (
+                <motion.div
+                key={idx}
+                whileTap={{scale: 0.92}}
+                className="px-3 py-1 text-xs bg-green-50 border-green-200 text-green-700 rounded-full cursor-pointer"
+                onClick={(e) =>{
+                    setText(suggestion)
+                }}
+                >
+                    {suggestion}
+                </motion.div>
+            ))}
+        </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-3"
         ref={chatBoxRef}

@@ -128,6 +128,7 @@ function DeliveryBoyDashBoard() {
       }
     }
 
+    if(loading) return (<Loader/>)
 
     if(activeOrder && userLocation){
       return (
@@ -165,7 +166,7 @@ function DeliveryBoyDashBoard() {
       )
     }
 
-    if(loading) return (<Loader/>)
+    
 
 
   return (
