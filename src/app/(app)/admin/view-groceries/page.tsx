@@ -85,7 +85,7 @@ function page() {
         if(!editing) return
         setIsEditing(true)
         try {
-            const groceryId = editing?._id
+            const groceryId = editing?._id!
             const formData = new FormData()
             formData.append("name", editing.name)
             formData.append("category", editing.category)
@@ -113,7 +113,7 @@ function page() {
         if(!editing) return
         setIsDeleting(true)
         try {
-            const groceryId = editing._id
+            const groceryId = editing._id!
             const response = await axios.post(`/api/admin/delete-grocery/${groceryId}`)
             toast.success(response.data.message || "Grocery item deleted")
             setEditing(null)

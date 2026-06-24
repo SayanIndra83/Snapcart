@@ -8,11 +8,15 @@ import mongoose from "mongoose"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
-import LiveMap from "./LiveMap"
 import { motion, AnimatePresence } from "motion/react"
 import { Check, MapPin, Package, Phone, User, X, Bike, Loader2, RefreshCcw } from "lucide-react"
 import DeliveryChat from "./DeliveryChat"
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import dynamic from "next/dynamic"
+
+const LiveMap = dynamic(() => import("@/components/LiveMap"), {
+  ssr: false
+})
 
 
 

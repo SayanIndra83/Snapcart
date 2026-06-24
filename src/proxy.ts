@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { auth } from './app/auth'
 
 export async function proxy(request: NextRequest) {
 
-    const token = await getToken({req: request, secret: process.env.BETTER_AUTH_SECRET})
+    // const token = await getToken({req: request, secret: process.env.BETTER_AUTH_SECRET})
     // console.log("token",token)
 
     // console.log("URL", request)
 
+    const session = await auth()
 
     const {pathname} = request.nextUrl
     console.log(pathname)
@@ -17,14 +19,14 @@ export async function proxy(request: NextRequest) {
     const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
 
     
-    if(!token && isProtected){
+    if(!session && isProtected){
       const redirectUrl = new URL('/sign-in', request.url)
       redirectUrl.searchParams.set("callbackUrl", request.url)
     // console.log("Redirect Url",redirectUrl)
       return NextResponse.redirect(redirectUrl)
     }
 
-    const role = token?.role
+    const role = session?.user.role
     // console.log("Role", role)
 
     if((pathname.startsWith('/user') && role !== 'user') || (pathname.startsWith('/deliveryboy') && role !== "deliveryboy") || (pathname.startsWith('/admin') && role !== "admin")) {

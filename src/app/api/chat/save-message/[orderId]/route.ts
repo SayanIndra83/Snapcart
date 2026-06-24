@@ -2,10 +2,9 @@ import dbConnect from "@/app/lib/dbConnect";
 import MessageModel from "@/app/models/Message.model";
 import OrderModel from "@/app/models/order.model";
 import UserModel from "@/app/models/user.model";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req : NextRequest, {params} : {params :Promise<{orderId : mongoose.Types.ObjectId}>}) {
+export async function POST(req : NextRequest, {params} : {params :Promise<{orderId : string}>}) {
     try {
 
         const {orderId} = await params

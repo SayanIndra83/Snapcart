@@ -2,10 +2,9 @@ import { auth } from "@/app/auth";
 import uploadOnCloudinary from "@/app/lib/cloudinary";
 import dbConnect from "@/app/lib/dbConnect";
 import GroceryModel from "@/app/models/grocery.model";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req:NextRequest, {params}: {params : Promise<{groceryId : mongoose.Types.ObjectId}>}) {
+export async function POST(req:NextRequest, {params}: {params : Promise<{groceryId : string}>}) {
     try {
          const session = await auth()
                 if(!session){

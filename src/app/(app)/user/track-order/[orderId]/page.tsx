@@ -5,7 +5,6 @@ import { IOrder } from '@/app/models/order.model'
 import { IUser } from '@/app/models/user.model'
 import { ApiResponse } from '@/app/types/ApiResponse'
 import { ILocation } from '@/components/DeliveryBoyDashBoard'
-import LiveMapCustomer from '@/components/LiveMapCustomer'
 import axios, { AxiosError } from 'axios'
 import { ArrowLeft, Loader2, Send, Sparkle, Loader, CheckCircle2, PackageCheck } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
@@ -14,6 +13,10 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion } from 'motion/react'
 import { IMessage } from '@/app/models/Message.model'
+import dynamic from 'next/dynamic'
+
+const LiveMapCustomer = dynamic(() => import("@/components/LiveMapCustomer"), {ssr: false})
+
 
 function Page({params} : {params: {orderId : string}}) {
   const [loading, setLoading] = useState(false)

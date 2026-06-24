@@ -22,55 +22,13 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
 import { useSelector } from "react-redux";
-import "leaflet/dist/leaflet.css";
-import mapIcon from "@/assets/mapIcon.png";
 import axios, { AxiosError } from "axios";
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import toast from "react-hot-toast";
 import { ApiResponse } from "@/app/types/ApiResponse";
+import dynamic from "next/dynamic";
 
-const markerIcon = new L.Icon({
-  iconUrl: mapIcon.src,
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
-
-const DraggableMarker = ({ 
-  position, 
-  setPosition 
-}: { 
-  position: [number, number], 
-  setPosition: React.Dispatch<React.SetStateAction<[number, number] | null>> 
-}) => {
-  const map = useMap()
-  
-  useEffect(() => {
-      if (position) {
-        map.flyTo(position, 16, { animate: true, duration: 1.5 })
-      }
-  }, [position, map])
-
-  return (
-    <Marker
-      icon={markerIcon}
-      position={position as LatLngExpression}
-      draggable={true}
-      eventHandlers={{
-        dragend: (e: L.LeafletEvent) => {
-          const marker = e.target as L.Marker;
-          const { lat, lng } = marker.getLatLng();
-          setPosition([lat, lng]);
-        },
-      }}
-    >
-      <Tooltip direction="top" offset={[0, -35]} opacity={1} permanent>
-        <span className="font-semibold text-gray-700 text-xs">Drag to adjust</span>
-      </Tooltip>
-    </Marker>
-  );
-};
+const CheckoutMap = dynamic(() => import("@/components/CheckOutMap"), {ssr: false})
 
 
 export default function Page() {
@@ -145,6 +103,7 @@ export default function Page() {
   const handleSearchQuery = async() => {
     setSearchingLoading(true)
     try {
+      const {OpenStreetMapProvider} = await import("leaflet-geosearch")
         const provider = new OpenStreetMapProvider();
         const results = await provider.search({ query: searchQuery });
         if(results && results.length > 0){
@@ -406,16 +365,7 @@ export default function Page() {
 
               <div className="relative mt-4 h-[350px] rounded-2xl overflow-hidden border border-gray-200 shadow-inner group">
                 {position && (
-                  <MapContainer
-                    center={position as LatLngExpression}
-                    zoom={15} 
-                    scrollWheelZoom={true}
-                    className="w-full h-full z-0"
-                  >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <DraggableMarker position={position} setPosition={setPosition} />
-                  </MapContainer>
+                  <CheckoutMap position={position} setPosition={setPosition}/>
                 )}
 
                 <motion.button

@@ -3,10 +3,9 @@ import dbConnect from "@/app/lib/dbConnect";
 import emitEventHandler from "@/app/lib/emitEventHandler";
 import AssignmentModel from "@/app/models/delivery-assignment.model";
 import OrderModel from "@/app/models/order.model";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req:NextRequest, {params} : {params : Promise<{orderId : mongoose.Types.ObjectId}>}) {
+export async function POST(req:NextRequest, {params} : {params : Promise<{orderId : string}>}) {
     try {
         const session = await auth()
         if(!session || !session.user) {
