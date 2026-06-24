@@ -74,7 +74,7 @@ Follow these steps to run Snapcart locally on your machine.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/snapcart.git
+git clone https://github.com/SayanIndra83/snapcart.git
 cd snapcart
 ```
 
