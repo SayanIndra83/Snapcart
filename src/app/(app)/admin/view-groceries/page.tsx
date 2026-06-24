@@ -20,6 +20,9 @@ function page() {
     const [backendImage, setBackendImage] = useState<Blob | null>(null)
     const [isEditing, setIsEditing] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [searchText, setSearchText] = useState("")
+    const [filtered, setFiltered] = useState<IGrocery[]>()
+
     const category = [
         "Fruits & Vegetables",
         "Dairy & Eggs",
@@ -44,6 +47,7 @@ function page() {
                 const response = await axios.get('/api/admin/get-groceries')
                 // console.log(response.data.groceries)
                 setMyGroceries(response.data.groceries)
+                setFiltered(response.data.groceries)
             } catch (error) {
                 const axiosError = error as AxiosError<ApiResponse>
                 console.log(axiosError.response?.data?.message!)
@@ -123,6 +127,21 @@ function page() {
             setIsDeleting(false)
         }
     }
+
+    const handleSearch =(e:React.FormEvent<HTMLInputElement>)=> {
+        e.preventDefault()
+        const q = searchText.toLowerCase()
+        if(!q) {
+            setFiltered(myGroceries)
+            return
+        }
+        setFiltered(
+            myGroceries?.filter((g) => 
+                g.name.toLowerCase().includes(q) || g.category.toLowerCase().includes(q)
+            )
+        )
+
+    }
     if(loading) return (<Loader/>)
   return (
     <div className="w-full min-h-screen">
@@ -155,16 +174,32 @@ function page() {
         initial={{opacity:0, y:10}}
         animate={{opacity:1, y: 0}}
         transition={{duration: 0.4}}
-        className="flex items-center bg-white border border-gray-200 rounded-full px-5 py-3 shadow-sm hover:shadow-lg mt-10 mb-10 transition-all duration-300 max-w-lg w-full mx-auto "
+        className="flex items-center bg-white border border-gray-200 rounded-full px-5 py-3 shadow-sm hover:shadow-lg mt-8 mb-10 transition-all duration-300 max-w-lg w-full mx-auto "
         >
             <Search className="text-gray-500 mr-2 w-5 h-5"/>
             <input 
             type="text" 
             placeholder="Search by name or category..."
+            value={searchText}
+            onChange={(e) => {
+                e.preventDefault()
+                setSearchText(e.target.value)
+                handleSearch(e)
+            }}
             className="w-full outline-none text-gray-700 placeholder:text-gray-400" />
+            {searchText && (
+                <button className="text-gray-500 ml-3 hover:text-gray-600 transition-colors duration-300 cursor-pointer"
+            
+            onClick={(e) => {
+                e.preventDefault()
+                setSearchText("")}}
+            >
+                <X className="w-5  h-5"/>
+            </button>
+            )}
         </motion.form>
         <div className="space-y-4 w-[90%] md:w-[80%] mx-auto mb-20">
-            {myGroceries?.map((g, i) => (
+            {filtered?.map((g, i) => (
                         <motion.div
                         key={i}
                         whileHover={{scale:1.01}}

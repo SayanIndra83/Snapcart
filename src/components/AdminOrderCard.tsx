@@ -187,7 +187,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             )}
           </p>
 
-          {currOrder.assignedDeliveryBoy && (
+          {currOrder.status !== "delivered" && currOrder.assignedDeliveryBoy && (
             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3 text-sm text-gray-700">
                 <UserCheck className="text-blue-600" size={18}/>

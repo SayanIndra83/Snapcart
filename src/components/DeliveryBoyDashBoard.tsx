@@ -10,8 +10,9 @@ import toast from "react-hot-toast"
 import { useSelector } from "react-redux"
 import LiveMap from "./LiveMap"
 import { motion, AnimatePresence } from "motion/react"
-import { Check, MapPin, Package, Phone, User, X, Bike, Loader2 } from "lucide-react"
+import { Check, MapPin, Package, Phone, User, X, Bike, Loader2, RefreshCcw } from "lucide-react"
 import DeliveryChat from "./DeliveryChat"
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
 
 
@@ -31,7 +32,7 @@ interface IAddres {
   state: string
 }
 
-function DeliveryBoyDashBoard() {
+function DeliveryBoyDashBoard({earning} : {earning : number}) {
   const [assignments, setAssingnments] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeOrder, setActiveOrder] = useState<any>(null)
@@ -167,7 +168,8 @@ function DeliveryBoyDashBoard() {
         const response = await axios.post(`/api/deliveryboy/otp/verify-delivery-otp/${activeOrder._id}`, {otp})
         toast.success(response.data.message)
         setActiveOrder(null)
-        await fetchActiveAssignment()
+        // await fetchActiveAssignment()
+        window.location.reload()
       } catch (error) {
         const axiosError = error as AxiosError<ApiResponse>
           toast.error(axiosError.response?.data?.message!)
@@ -266,14 +268,20 @@ function DeliveryBoyDashBoard() {
       )
     }
 
-    
+    const todaysEarning = [
+      {
+        name: "Today",
+        earning,
+        deliveries: earning/40
+      }
+    ]
 
 
   return (
     <div className="w-full min-h-screen bg-gray-50/50 pt-24 sm:pt-28 pb-8 px-4 sm:px-8">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto mb-10">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Delivery Requests</h2>
+          <h2 className="text-xl sm:text-3xl font-extrabold text-green-800">Delivery Requests</h2>
           <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
             {assignments.length} Pending
           </span>
@@ -291,7 +299,8 @@ function DeliveryBoyDashBoard() {
             <h3 className="text-lg font-bold text-gray-900">No Pending Orders</h3>
             <p className="text-gray-500 text-sm mt-1 max-w-xs leading-relaxed">You are currently offline or there are no new delivery requests in your area.</p>
           </motion.div>
-        ) : (
+          
+      ) : (
           <div className="space-y-4">
             <AnimatePresence>
               {assignments?.map((data) => (
@@ -347,6 +356,28 @@ function DeliveryBoyDashBoard() {
           </div>
         )}
       </div>
+
+        <div className="flex w-full p-6 border-t border-dashed border-gray-400 text-left">
+            <div className="max-w-3xl mx-auto mb-10">
+                <h2 className="text-xl sm:text-3xl font-extrabold text-green-800 mb-5">Today's Earning</h2>
+                <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={todaysEarning}>
+                            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip/>
+                            <Legend/>
+                            <Bar dataKey="earnings" name="Earnings (₹)" fill="#16A34A" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="deliveries" name="Deliveries" fill="#16A34A" radius={[6, 6, 0, 0]} />
+                            </BarChart>
+                      </ResponsiveContainer>
+
+                      <p className="mt-4 text-lg font-bold text-green-700">₹{earning || 0} Earned today</p>
+                      <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg flex items-center justify-center gap-3 cursor-pointer font-semibold text-base"
+                      onClick={() => window.location.reload()}
+                      > <RefreshCcw size={18}/> Refresh Earning</button>
+            </div>
+        </div>
     </div>
   )
 }

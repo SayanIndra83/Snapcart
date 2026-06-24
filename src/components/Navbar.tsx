@@ -5,12 +5,13 @@ import { signOut, useSession } from 'next-auth/react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { createPortal } from 'react-dom'
 import { IUser } from './EditRole'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
+import { useRouter } from 'next/navigation'
 
 function Navbar({user} : {user:IUser}) {
     const [loggingOut, setLoggingOut] = useState(false)
@@ -18,7 +19,7 @@ function Navbar({user} : {user:IUser}) {
     const [searchBarOpen, setSearchBarOpen] = useState(false)
     const [searchBarContent, setSearchBarContent] = useState("")
     const [menuOpen, setMenuOpen] = useState(false)
-    
+    const router = useRouter()
     const {cartData} = useSelector((state:RootState) => state.cart)
     // console.log(cartData)
     const handleLogout = async () => {
@@ -33,7 +34,15 @@ function Navbar({user} : {user:IUser}) {
             setMenuOpen(false)
         }
     }
-
+    const handleSearch = (e:FormEvent) => {
+            e.preventDefault()
+            const q = searchBarContent.trim()
+            if(!q) return router.push('/')
+            
+            router.push(`/?q=${encodeURIComponent(q)}`)
+            setSearchBarContent("")
+            setSearchBarOpen(false)
+    }
     const profileDropDown = useRef<HTMLDivElement>(null)
 
     useEffect(()=>{
@@ -169,20 +178,13 @@ function Navbar({user} : {user:IUser}) {
       (
         <form
       className='hidden md:flex items-center rounded-full bg-white w-1/2 max-w-lg py-1 px-4 shadow-md'
+      onSubmit={handleSearch}
       >
             <Search className='text-gray-500 w-4 h-4 mr-2'/>
             <input type="text"
             value={searchBarContent}
             onChange={(e) => setSearchBarContent(e.target.value)}
             placeholder='Search groceries...' className='w-full outline-none text-gray-700 placeholder-gray-400' />
-            {
-                searchBarContent !== "" &&
-                <button
-                onClick={() => setSearchBarContent("")}
-                >
-                <X className='w-4 h-4 text-gray-500 ml-2 cursor-pointer hover:text-gray-700'/>
-            </button>
-            }
             
             
       </form>
@@ -389,9 +391,13 @@ function Navbar({user} : {user:IUser}) {
                 >
 
                     <Search className='text-gray-500 w-5 h-5  mr-2'/>
-                    <form action="" className='grow'>
+                    <form action="" className='grow'
+                    onSubmit={handleSearch}
+                    >
                         <input type="text"
                         placeholder='Search groceries...'
+                        value={searchBarContent}
+                        onChange={(e) => setSearchBarContent(e.target.value)}
                         className='w-full outline-none text-gray-700'/>
                     </form>
                     <button
@@ -503,47 +509,6 @@ function Navbar({user} : {user:IUser}) {
 }
             </AnimatePresence>
 
-
-            <AnimatePresence>
-                {searchBarOpen && 
-                <motion.div
-                initial={{
-                    opacity:0,
-                    y:-10,
-                    scale:0.5
-                }}
-                animate={{
-                    opacity:1,
-                    y:0,
-                    scale:1
-                }}
-                transition={{
-                    duration:0.3
-                }}
-                exit={{
-                   opacity:0,
-                    y:-10,
-                    scale:0.5,
-                    transition:{duration:0.3}
-                }}
-
-                className='fixed top-20 left-1/2 -translate-x-1/2 w-[90%] bg-gray-100 rounded-full shadow-lg z-40 flex items-center px-4 py-2 border border-gray-200 '
-                >
-
-                    <Search className='text-gray-500 w-5 h-5  mr-2'/>
-                    <form action="" className='grow'>
-                        <input type="text"
-                        placeholder='Search groceries...'
-                        className='w-full outline-none text-gray-700'/>
-                    </form>
-                    <button
-                    onClick={() => setSearchBarOpen(false)}
-                    >
-                        <X className='text-gray-500 h-5 w-5'/>
-                    </button>
-                </motion.div>
-                }
-            </AnimatePresence>
 
         </div>
         )}

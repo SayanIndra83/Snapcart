@@ -181,7 +181,7 @@ function UserOrderCard({order} : {order: IOrder}) {
             <span >{currOrder.address.fullAddress}</span>
         </div>
 
-        {currOrder.assignedDeliveryBoy && (
+        {currOrder.assignedDeliveryBoy && currOrder.status !== "delivered" && (
             <>
                     <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3 text-sm text-gray-700">

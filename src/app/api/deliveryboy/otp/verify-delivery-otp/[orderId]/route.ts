@@ -58,7 +58,6 @@ export async function POST(req:NextRequest, {params} : {params : Promise<{orderI
        order.status = "delivered"
        order.isOtpVerified = true
        order.deliveredAt = new Date()
-       order.assignedDeliveryBoy = null 
        order.isPaid = true
        await order.save()
 
@@ -73,7 +72,7 @@ export async function POST(req:NextRequest, {params} : {params : Promise<{orderI
             success: false
         }, {status: 404})
        }
-       await order.populate("user")
+       await order.populate("user assignedDeliveryBoy")
        await emitEventHandler("order-delivered", order)
        return NextResponse.json({
             message: "Order delivered",
