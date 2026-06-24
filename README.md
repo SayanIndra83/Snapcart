@@ -128,26 +128,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ---
 
-## 📱 Screenshots
-
-| Home Page | Live Map Tracking |
-|-----------|------------------|
-| ![Home Page](/path-to-image.png) | ![Live Map Tracking](/path-to-image.png) |
-
-| Admin Dashboard | Socket Chat & AI |
-|----------------|-----------------|
-| ![Admin Dashboard](/path-to-image.png) | ![Socket Chat & AI](/path-to-image.png) |
-
----
-
 ## 👨‍💻 Developer
 
 Designed and engineered by **Sayan Indra**
 
 Full-Stack Developer | Electrical Engineering, Jadavpur University
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Sayan Indra](https://linkedin.com)
+- GitHub: [@SayanIndra83](https://github.com/SayanIndra83)
+- LinkedIn: [Sayan Indra](https://www.linkedin.com/in/sayan-indra-a41319369/)
 
 ---
 
