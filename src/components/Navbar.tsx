@@ -111,12 +111,12 @@ function Navbar({user} : {user:IUser}) {
             </Link>
 
             <Link
-              href="/admin/view"
+              href="/admin/view-groceries"
               onClick={() => setMenuOpen(false)}
               className='flex items-center gap-3 p-3 rounded-xl bg-white/10 active:scale-95 transition-all text-white/90 hover:text-white'
             >
               <Store className='h-5 w-5 text-green-300' />
-              <span>View Grocery</span>
+              <span>View Groceries</span>
             </Link>
 
             <Link
@@ -228,11 +228,11 @@ function Navbar({user} : {user:IUser}) {
                     </span>
                 </Link>
                 <Link 
-                    href="/admin/view" 
+                    href="/admin/view-groceries" 
                     className='group relative bg-white rounded-full flex items-center justify-center gap-2  shadow-md hover:scale-103 hover:bg-green-50 transition-all cursor-pointer font-semibold px-2.5 py-1.5 text-sm text-gray-700'
                 >
                     <Store className='h-4 w-4 text-green-600'/>
-                    <span className='group-hover:text-green-700 transition-all duration-200'>View Grocery</span>
+                    <span className='group-hover:text-green-700 transition-all duration-200'>View Groceries</span>
                 </Link>
 
                 <Link 
