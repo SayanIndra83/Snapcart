@@ -5,7 +5,7 @@ import { ReactNode, useState } from "react"
 import toast from "react-hot-toast"
 import { motion } from "motion/react"
 import { ArrowRight, Bike, Loader2, Phone, User, UserCog } from "lucide-react"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
 export interface IUser{

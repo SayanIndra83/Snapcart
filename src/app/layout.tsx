@@ -27,6 +27,11 @@ export default function RootLayout({
             {children}
           </StoreProvider>
         </AuthProvider>
+
+        <script 
+        src="https://support-ai-pi-two.vercel.app/chatBot.js" 
+        data-owner-id="usr_131836688929391618">
+        </script>
         </body>
     </html>
   );
